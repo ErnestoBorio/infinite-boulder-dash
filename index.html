@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Infinite Boulder Dash</title>
+  <meta name="description" content="Infinite procedural cave exploration Boulder Dash mod with permadeath roguelike mechanics and Ernesto Borio's Drean 16-color palette.">
+  <link rel="stylesheet" href="css/boulderdash.css">
+</head>
+<body>
+
+  <!-- Fullscreen Rendering Canvas -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- Floating Milestone & Event Message Banner (Top of Screen, not covering player) -->
+  <div id="message-banner"></div>
+
+  <!-- Floating Top Controls Toolbar -->
+  <div class="top-toolbar">
+    <button id="btn-sound" class="btn" title="Toggle Sound (M)">SOUND: ON</button>
+    <button id="btn-new-world" class="btn" title="Generate New World Seed">NEW WORLD</button>
+  </div>
+
+  <!-- Roguelike Game Over Modal -->
+  <div id="death-modal" class="modal-overlay">
+    <div class="death-card">
+      <div class="death-title">CRUSHED!</div>
+      <div class="death-subtitle">Rockford perished in the deep infinite caverns</div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">Diamonds</div>
+          <div id="death-diamonds" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Final Score</div>
+          <div id="death-score" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Max Depth</div>
+          <div id="death-depth" class="stat-value">0m</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Time Survived</div>
+          <div id="death-time" class="stat-value">0s</div>
+        </div>
+      </div>
+
+      <div class="best-records">
+        <div>Best Score: <strong id="best-score" style="color:var(--drean-yellow)">0</strong></div>
+        <div>Best Depth: <strong id="best-depth" style="color:var(--drean-skyblue)">0m</strong></div>
+      </div>
+
+      <button id="btn-modal-retry" class="btn-new-run">NEW EXPEDITION</button>
+      <div class="seed-note">Each death generates a completely new procedural world!</div>
+    </div>
+  </div>
+
+  <!-- Bottom Controls & Touch Overlay -->
+  <footer class="bottom-overlay">
+    <!-- Desktop Controls Hint -->
+    <div class="controls-hint">
+      <span><strong>MOVE</strong>: <span class="key-tag">Arrows</span> / <span class="key-tag">WASD</span></span>
+      <span><strong>GRAB IN PLACE</strong>: <span class="key-tag">Space</span> + <span class="key-tag">Direction</span></span>
+      <span><strong>MUTE</strong>: <span class="key-tag">M</span></span>
+      <span><strong>RESTART</strong>: <span class="key-tag">R</span></span>
+    </div>
+
+    <!-- Mobile / Touch Controls -->
+    <div class="touch-controls">
+      <div class="dpad">
+        <div></div>
+        <button class="dpad-btn" data-dir="ArrowUp" aria-label="Up">▲</button>
+        <div></div>
+        <button class="dpad-btn" data-dir="ArrowLeft" aria-label="Left">◀</button>
+        <div></div>
+        <button class="dpad-btn" data-dir="ArrowRight" aria-label="Right">▶</button>
+        <div></div>
+        <button class="dpad-btn" data-dir="ArrowDown" aria-label="Down">▼</button>
+        <div></div>
+      </div>
+
+      <div class="action-pad">
+        <button id="touch-grab" class="action-btn" aria-label="Grab in place">GRAB</button>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

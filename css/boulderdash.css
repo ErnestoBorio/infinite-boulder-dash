@@ -1,0 +1,354 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;700&display=swap');
+
+:root {
+  --drean-black: #000000;
+  --drean-blue: #0000FF;
+  --drean-red: #FF0000;
+  --drean-magenta: #FF00FF;
+  --drean-green: #00FF00;
+  --drean-cyan: #00FFFF;
+  --drean-yellow: #FFFF00;
+  --drean-white: #FFFFFF;
+  --drean-skin: #FFDBAC;
+  --drean-brown: #8B4513;
+  --drean-teal: #008080;
+  --drean-violet: #8A2BE2;
+  --drean-skyblue: #87CEEB;
+  --drean-lightred: #FF8080;
+  --drean-lightgray: #ABABAB;
+  --drean-darkgray: #575757;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--drean-black);
+  color: var(--drean-white);
+  font-family: 'Outfit', sans-serif;
+  user-select: none;
+}
+
+/* Fullscreen Canvas */
+#game-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  z-index: 1;
+}
+
+/* Floating Top Controls Toolbar: Docked cleanly at top right */
+.top-toolbar {
+  position: fixed;
+  top: 6px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 20;
+}
+
+.btn {
+  background: rgba(15, 13, 27, 0.85);
+  color: var(--drean-white);
+  border: 1px solid var(--drean-teal);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  background: var(--drean-teal);
+  border-color: var(--drean-yellow);
+  color: var(--drean-yellow);
+  box-shadow: 0 0 10px rgba(0, 128, 128, 0.5);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Floating Milestone & Event Message Banner: Positioned at TOP, NEVER covering Rockford */
+#message-banner {
+  position: fixed;
+  top: 56px; /* Just below top HUD bar */
+  left: 50%;
+  transform: translateX(-50%) translateY(-15px);
+  background: rgba(15, 13, 27, 0.96);
+  border: 2px solid var(--drean-yellow);
+  color: var(--drean-yellow);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  padding: 10px 22px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-shadow: 2px 2px 0px #000;
+  z-index: 100;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 0, 0.25);
+  white-space: nowrap;
+}
+
+#message-banner.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Roguelike Death / Game Over Modal: Only subtly darkens the screen */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.death-card {
+  background: #141124;
+  border: 3px solid var(--drean-lightred);
+  border-radius: 12px;
+  padding: 32px 40px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 128, 128, 0.3);
+  animation: cardPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cardPop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.death-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.3rem;
+  color: var(--drean-lightred);
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.death-subtitle {
+  color: var(--drean-lightgray);
+  font-size: 0.85rem;
+  margin-bottom: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 128, 128, 0.4);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--drean-skyblue);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.95rem;
+  color: var(--drean-yellow);
+}
+
+.best-records {
+  background: rgba(0, 128, 128, 0.15);
+  border: 1px dashed var(--drean-teal);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  color: var(--drean-lightgray);
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.btn-new-run {
+  width: 100%;
+  padding: 14px;
+  background: var(--drean-teal);
+  border: 2px solid var(--drean-yellow);
+  color: var(--drean-yellow);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 15px rgba(0, 128, 128, 0.4);
+}
+
+.btn-new-run:hover {
+  background: var(--drean-yellow);
+  color: var(--drean-black);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 0, 0.5);
+}
+
+.btn-new-run:active {
+  transform: translateY(1px);
+}
+
+.seed-note {
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: var(--drean-lightgray);
+  font-style: italic;
+}
+
+/* Bottom Controls & Info Overlay */
+.bottom-overlay {
+  position: fixed;
+  bottom: 12px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.controls-hint {
+  pointer-events: auto;
+  background: rgba(15, 13, 27, 0.85);
+  border: 1px solid rgba(0, 128, 128, 0.5);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  color: var(--drean-lightgray);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.controls-hint strong {
+  color: var(--drean-yellow);
+}
+
+.key-tag {
+  display: inline-block;
+  background: rgba(0, 128, 128, 0.3);
+  border: 1px solid var(--drean-teal);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--drean-white);
+  font-size: 0.75rem;
+}
+
+/* Mobile / Touch D-Pad & Controls */
+.touch-controls {
+  pointer-events: auto;
+  display: none;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .touch-controls {
+    display: flex;
+  }
+  .controls-hint {
+    display: none;
+  }
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 46px);
+  grid-template-rows: repeat(3, 46px);
+  gap: 4px;
+}
+
+.dpad-btn {
+  background: rgba(15, 13, 27, 0.85);
+  border: 1px solid var(--drean-teal);
+  border-radius: 8px;
+  color: var(--drean-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  touch-action: manipulation;
+}
+
+.dpad-btn:active {
+  background: var(--drean-teal);
+  color: var(--drean-yellow);
+}
+
+.action-pad {
+  display: flex;
+  align-items: center;
+}
+
+.action-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--drean-teal);
+  border: 2px solid var(--drean-yellow);
+  color: var(--drean-yellow);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.action-btn:active {
+  background: var(--drean-yellow);
+  color: var(--drean-black);
+}

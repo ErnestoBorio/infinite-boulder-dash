@@ -1,0 +1,13 @@
+{
+  "name": "boulder-dash-c64",
+  "version": "1.0.0",
+  "description": "Commodore 64 Boulder Dash faithful rewrite in JavaScript",
+  "type": "module",
+  "scripts": {
+    "test": "node test/test-caves.js && node test/test-engine.js && node test/test-infinite.js && node test/test-roguelike.js",
+    "serve": "npx serve ."
+  },
+  "keywords": ["boulderdash", "c64", "retro", "game"],
+  "author": "",
+  "license": "MIT"
+}
