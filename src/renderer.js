@@ -191,6 +191,10 @@ export class BoulderDashRenderer {
 
     // Animation frame timer
     this.animTime = 0;
+
+    // Center HUD Title Image
+    this.titleImage = null;
+    this.titleImageLoaded = false;
   }
 
   async loadSprites(src = 'images/sprites.png') {
@@ -209,6 +213,46 @@ export class BoulderDashRenderer {
         resolve(img);
       };
       img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  async loadTitle(src = 'images/title.png') {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width = img.width;
+          c.height = img.height;
+          const ctx = c.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const imgData = ctx.getImageData(0, 0, c.width, c.height);
+          const data = imgData.data;
+          // Convert pure black background to transparent for seamless blending with HUD
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0) {
+              data[i + 3] = 0;
+            }
+          }
+          ctx.putImageData(imgData, 0, 0);
+          this.titleImage = c;
+          this.titleImageLoaded = true;
+          resolve(c);
+        } catch (e) {
+          this.titleImage = img;
+          this.titleImageLoaded = true;
+          resolve(img);
+        }
+      };
+      img.onerror = () => {
+        if (src !== 'Boulder dash title.png') {
+          this.loadTitle('Boulder dash title.png').then(resolve);
+        } else {
+          this.titleImageLoaded = false;
+          resolve(null);
+        }
+      };
       img.src = src;
     });
   }
@@ -474,23 +518,54 @@ export class BoulderDashRenderer {
     ctx.fillText(`${this.engine.diamondsCollected}/${nextTarget}`, 52, 28);
 
     // 2. Exploration Depth
-    ctx.font = '600 13px "Outfit", sans-serif';
-    ctx.fillStyle = RETRO_PALETTE[12].hex; // Sky Blue
-    ctx.fillText(`DEPTH: ${this.engine.maxDepth}m`, 160, 27);
+    let leftOffset = 150;
+    if (cw >= 850) {
+      ctx.font = '600 13px "Outfit", sans-serif';
+      ctx.fillStyle = RETRO_PALETTE[12].hex; // Sky Blue
+      ctx.fillText(`DEPTH: ${this.engine.maxDepth}m`, leftOffset, 27);
+      leftOffset += 105;
+    }
 
     // 3. Seed / Roguelike World
-    ctx.fillStyle = RETRO_PALETTE[14].hex; // Light Gray
-    ctx.fillText(`SEED: #${this.engine.seed}`, 270, 27);
+    if (cw >= 1050) {
+      ctx.font = '600 13px "Outfit", sans-serif';
+      ctx.fillStyle = RETRO_PALETTE[14].hex; // Light Gray
+      ctx.fillText(`SEED: #${this.engine.seed}`, leftOffset, 27);
+    }
 
-    // 4. Score on the right, safely to the left of the top-toolbar (which is docked at right: 16px)
+    // 4. Center Title Image (Boulder dash title.png)
+    if (this.titleImageLoaded && this.titleImage) {
+      const origW = this.titleImage.width || 495;
+      const origH = this.titleImage.height || 71;
+      const aspect = origW / origH;
+      let targetH = 32;
+      let targetW = Math.round(targetH * aspect);
+
+      const maxCenterSpace = Math.max(120, cw - 440);
+      if (targetW > maxCenterSpace) {
+        targetW = maxCenterSpace;
+        targetH = Math.round(targetW / aspect);
+      }
+
+      const titleX = Math.round((cw - targetW) / 2);
+      const titleY = Math.round((hudHeight - targetH) / 2);
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(this.titleImage, titleX, titleY, targetW, targetH);
+      ctx.imageSmoothingEnabled = false;
+    }
+
+    // 5. Score on the right, safely to the left of the top-toolbar (which is docked at right: 16px)
     ctx.font = '700 15px "Press Start 2P", monospace';
     ctx.fillStyle = RETRO_PALETTE[7].hex; // White
     const scoreStr = String(this.engine.score).padStart(6, '0');
     const scoreText = `SCORE ${scoreStr}`;
     const scoreWidth = ctx.measureText(scoreText).width;
     const toolbarMargin = 245; // Reserved width for top toolbar buttons
-    const scoreX = Math.max(380, cw - toolbarMargin - scoreWidth - 16);
-    ctx.fillText(scoreText, scoreX, 28);
+    const scoreX = Math.max(cw - toolbarMargin - scoreWidth - 16, Math.round((cw + 260) / 2));
+    if (cw >= 600 || scoreX > (cw / 2 + 100)) {
+      ctx.fillText(scoreText, scoreX, 28);
+    }
   }
 
   renderSpriteIcon(ctx, sprite, sx, sy, sw, sh) {

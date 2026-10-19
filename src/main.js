@@ -120,11 +120,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   renderer = new BoulderDashRenderer(canvas, engine);
 
   try {
-    await renderer.loadSprites('images/sprites.png');
+    await Promise.all([
+      renderer.loadSprites('images/sprites.png'),
+      renderer.loadTitle('images/title.png')
+    ]);
     renderer.recolorWithPalette(engine.seed);
-    console.log('Sprites loaded and entity palettes randomized for seed #' + engine.seed);
+    console.log('Sprites and title loaded, entity palettes randomized for seed #' + engine.seed);
   } catch (err) {
-    console.error('Failed to load sprites:', err);
+    console.error('Failed to load assets:', err);
   }
 
   function resize() {
