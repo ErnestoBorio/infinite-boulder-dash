@@ -504,10 +504,12 @@ export class BoulderDashRenderer {
 
     // Rockford animated states
     if (obj === OBJECT.ROCKFORD) {
-      if (this.engine.moving.dir === DIR.LEFT || (this.engine.moving.dir === null && this.engine.moving.lastXDir === DIR.LEFT && this.engine.moving.grab)) {
-        sprite = OBJECT.ROCKFORD.left;
-      } else if (this.engine.moving.dir === DIR.RIGHT || (this.engine.moving.dir === null && this.engine.moving.lastXDir === DIR.RIGHT && this.engine.moving.grab)) {
-        sprite = OBJECT.ROCKFORD.right;
+      const dir = this.engine.moving.dir;
+      const isMoving = dir !== null;
+      const isFacingLeft = (dir === DIR.LEFT) || (dir !== DIR.RIGHT && this.engine.moving.lastXDir === DIR.LEFT);
+
+      if (isMoving || this.engine.moving.grab) {
+        sprite = isFacingLeft ? OBJECT.ROCKFORD.left : OBJECT.ROCKFORD.right;
       } else if (this.engine.idle.blink && this.engine.idle.tap) {
         sprite = OBJECT.ROCKFORD.blinktap;
       } else if (this.engine.idle.blink) {
@@ -602,7 +604,7 @@ export class BoulderDashRenderer {
     const scoreStr = String(this.engine.score).padStart(6, '0');
     const scoreText = `SCORE ${scoreStr}`;
     const scoreWidth = ctx.measureText(scoreText).width;
-    const toolbarMargin = 245; // Reserved width for top toolbar buttons
+    const toolbarMargin = (cw >= 800) ? 315 : 250; // Reserved width for top toolbar buttons
     const scoreX = Math.max(cw - toolbarMargin - scoreWidth - 16, Math.round((cw + 260) / 2));
     if (cw >= 600 || scoreX > (cw / 2 + 100)) {
       ctx.fillText(scoreText, scoreX, 28);

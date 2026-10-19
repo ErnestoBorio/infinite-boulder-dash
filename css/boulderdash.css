@@ -87,6 +87,21 @@ html, body {
   transform: translateY(1px);
 }
 
+a.btn {
+  text-decoration: none;
+}
+
+.btn svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+@media (max-width: 800px) {
+  .btn-github span {
+    display: none;
+  }
+}
+
 /* Floating Milestone & Event Message Banner: Positioned at TOP, NEVER covering Rockford */
 #message-banner {
   position: fixed;
