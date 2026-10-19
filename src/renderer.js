@@ -229,16 +229,57 @@ export class BoulderDashRenderer {
           ctx.drawImage(img, 0, 0);
           const imgData = ctx.getImageData(0, 0, c.width, c.height);
           const data = imgData.data;
-          // Convert pure black background to transparent for seamless blending with HUD
-          for (let i = 0; i < data.length; i += 4) {
-            if (data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0) {
-              data[i + 3] = 0;
+
+          // Check if image already has native transparency
+          let hasTransparent = false;
+          for (let i = 3; i < data.length; i += 4) {
+            if (data[i] < 250) {
+              hasTransparent = true;
+              break;
             }
           }
-          ctx.putImageData(imgData, 0, 0);
-          this.titleImage = c;
+
+          // If fully opaque without alpha, key out pure black background
+          if (!hasTransparent) {
+            for (let i = 0; i < data.length; i += 4) {
+              if (data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0) {
+                data[i + 3] = 0;
+              }
+            }
+            ctx.putImageData(imgData, 0, 0);
+          }
+
+          // Auto-trim transparent borders (threshold of alpha > 15 ignores faint mask dust)
+          let minX = c.width, maxX = 0, minY = c.height, maxY = 0;
+          let hasVisible = false;
+          for (let y = 0; y < c.height; y++) {
+            for (let x = 0; x < c.width; x++) {
+              const a = data[(y * c.width + x) * 4 + 3];
+              if (a > 15) {
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+                hasVisible = true;
+              }
+            }
+          }
+
+          if (hasVisible && (minX > 0 || minY > 0 || maxX < c.width - 1 || maxY < c.height - 1)) {
+            const trimW = maxX - minX + 1;
+            const trimH = maxY - minY + 1;
+            const trimmed = document.createElement('canvas');
+            trimmed.width = trimW;
+            trimmed.height = trimH;
+            const trimCtx = trimmed.getContext('2d');
+            trimCtx.drawImage(c, minX, minY, trimW, trimH, 0, 0, trimW, trimH);
+            this.titleImage = trimmed;
+          } else {
+            this.titleImage = c;
+          }
+
           this.titleImageLoaded = true;
-          resolve(c);
+          resolve(this.titleImage);
         } catch (e) {
           this.titleImage = img;
           this.titleImageLoaded = true;
@@ -535,10 +576,10 @@ export class BoulderDashRenderer {
 
     // 4. Center Title Image (Boulder dash title.png)
     if (this.titleImageLoaded && this.titleImage) {
-      const origW = this.titleImage.width || 495;
-      const origH = this.titleImage.height || 71;
+      const origW = this.titleImage.width || 494;
+      const origH = this.titleImage.height || 80;
       const aspect = origW / origH;
-      let targetH = 32;
+      let targetH = 34;
       let targetW = Math.round(targetH * aspect);
 
       const maxCenterSpace = Math.max(120, cw - 440);
