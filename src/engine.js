@@ -632,7 +632,7 @@ export class BoulderDashEngine {
     if (this.nextMilestone && this.diamondsCollected >= this.nextMilestone.count) {
       const milestone = this.nextMilestone;
       this.score += milestone.bonus;
-      this.flashFrames = 8;
+      this.flashFrames = 6;
 
       this.onEvent('milestone_reached', {
         count: milestone.count,

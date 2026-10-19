@@ -1,7 +1,7 @@
 # Infinite Boulder Dash
 
-A roguelike permadeath infinite cave exploring version of the classic **Boulder Dash**
-Made by **Ernesto Borio** with LLMs based on the original Commodore 64 game.
+A roguelike permadeath infinite cave exploring version of the classic game **Boulder Dash**  
+Made with LLMs based on the original Commodore 64 game.
 
 ## Play it online
 https://ernestoborio.github.io/infinite-boulder-dash
@@ -15,7 +15,7 @@ https://ernestoborio.github.io/infinite-boulder-dash
 
 ## Description
 The cave is semi-randomly generated as the user explores it, giving the impression of an infinite world.  
-The world is generated anew each time the user looses a life.  
+The world is generated anew each time the user loses a life.  
 There's no level goal, the game just goes on infinitely.  
 Achieve the maximum score and exploration depth.
 
@@ -87,7 +87,8 @@ BoulderDash/
 ├── package.json          # Test runner scripts
 └── README.md             # Project documentation
 ```
-
+## Source
+https://github.com/ErnestoBorio/infinite-boulder-dash
 
 ## License
 This project is free for you to do whatever you want, just give due credit to Peter Liepa, Chris Gray and Jake Gordon.
