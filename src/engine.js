@@ -3,7 +3,7 @@
  * Features permadeath procedural worlds, milestone progression, and infinite cave physics.
  */
 
-import { OBJECT, DIR, DREAN_PALETTE } from './caves.js';
+import { OBJECT, DIR, RETRO_PALETTE } from './caves.js';
 import { InfiniteWorld } from './infinite-world.js';
 
 export const MILESTONES = [
@@ -100,7 +100,7 @@ export class BoulderDashEngine {
     this.onEvent('level_loaded', {
       name: 'Infinite Caverns',
       seed: this.seed,
-      palette: DREAN_PALETTE
+      palette: RETRO_PALETTE
     });
   }
 

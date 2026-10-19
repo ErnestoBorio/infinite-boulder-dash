@@ -50,7 +50,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           sound.playCrack();
           showMessage(`NEW EXPEDITION - SEED #${data.seed}`, 2000);
           if (renderer && renderer.spritesLoaded) {
-            renderer.recolorWithDreanPalette(data.seed);
+            renderer.recolorWithPalette(data.seed);
           }
           break;
         case 'diamond_collected':
@@ -110,7 +110,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     engine.reset();
     if (renderer) {
       renderer.hasInitCamera = false;
-      renderer.recolorWithDreanPalette(engine.seed);
+      renderer.recolorWithPalette(engine.seed);
     }
   }
 
@@ -121,7 +121,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   try {
     await renderer.loadSprites('images/sprites.png');
-    renderer.recolorWithDreanPalette(engine.seed);
+    renderer.recolorWithPalette(engine.seed);
     console.log('Sprites loaded and entity palettes randomized for seed #' + engine.seed);
   } catch (err) {
     console.error('Failed to load sprites:', err);

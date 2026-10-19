@@ -1,15 +1,15 @@
 import { InfiniteWorld, CHUNK_SIZE } from '../src/infinite-world.js';
 import { BoulderDashEngine } from '../src/engine.js';
-import { DREAN_PALETTE, OBJECT, DIR } from '../src/caves.js';
+import { RETRO_PALETTE, OBJECT, DIR } from '../src/caves.js';
 
 console.log('Testing Infinite Boulder Dash World & Memory Persistence...');
 
-// 1. Test Drean Palette
-if (DREAN_PALETTE.length !== 16) {
-  console.error(`Expected 16 colors in Drean palette, got ${DREAN_PALETTE.length}`);
+// 1. Test 16-Color Retro Palette
+if (RETRO_PALETTE.length !== 16) {
+  console.error(`Expected 16 colors in retro palette, got ${RETRO_PALETTE.length}`);
   process.exit(1);
 }
-console.log(`✓ Verified Ernesto Borio's Drean 16-color palette (Black to Dark Gray)`);
+console.log(`✓ Verified 16-color retro palette (Black to Dark Gray)`);
 
 // 2. Test Infinite Chunk Generation & Memory Persistence
 const world = new InfiniteWorld(42);
@@ -105,7 +105,7 @@ engine.moving.dir = DIR.RIGHT;
 engine.update();
 console.log(`✓ Rockford moved to (${engine.rockford.x}, ${engine.rockford.y})`);
 
-// 4. Test Independent 4-Color Drean Palettes per Entity & Reset Randomization
+// 4. Test Independent 4-Color Retro Palettes per Entity & Reset Randomization
 import('../src/renderer.js').then(({ generateRandomEntityPalettes }) => {
   const seedA = 12345;
   const seedB = 98765;
@@ -119,29 +119,29 @@ import('../src/renderer.js').then(({ generateRandomEntityPalettes }) => {
     'amoeba', 'firefly', 'butterfly', 'explosion'
   ];
 
-  // Verify all entities have 4-color Drean palettes
+  // Verify all entities have 4-color palettes
   for (const ent of entities) {
     const pal = palettesA[ent];
     if (!pal || pal.length !== 4) {
       throw new Error(`Expected entity '${ent}' to have 4-color palette, got ${pal ? pal.length : 'none'}`);
     }
-    // Slot 0 is Black (DREAN_PALETTE[0])
-    if (pal[0].rgb !== DREAN_PALETTE[0].rgb) {
+    // Slot 0 is Black (RETRO_PALETTE[0])
+    if (pal[0].rgb !== RETRO_PALETTE[0].rgb) {
       throw new Error(`Expected Slot 0 of '${ent}' to be Black, got ${pal[0].name}`);
     }
-    // Slots 1, 2, 3 must have at least 2 distinct Drean colors (e.g. skin distinct from clothes)
+    // Slots 1, 2, 3 must have at least 2 distinct colors (e.g. skin distinct from clothes)
     const colors = new Set(pal.map(c => c.rgb));
     if (colors.size < 3) {
       throw new Error(`Expected at least 3 distinct colors in palette for '${ent}', got ${colors.size}`);
     }
-    // All colors must belong to DREAN_PALETTE
+    // All colors must belong to RETRO_PALETTE
     for (const c of pal) {
-      if (!DREAN_PALETTE.some(dp => dp.rgb === c.rgb)) {
-        throw new Error(`Color ${c.name} (${c.hex}) not found in official Drean palette!`);
+      if (!RETRO_PALETTE.some(dp => dp.rgb === c.rgb)) {
+        throw new Error(`Color ${c.name} (${c.hex}) not found in official palette!`);
       }
     }
   }
-  console.log(`✓ Verified independent 4-color Drean palettes for all 11 entities (Rockford, boulders, diamonds, etc.)`);
+  console.log(`✓ Verified independent 4-color retro palettes for all 11 entities (Rockford, boulders, diamonds, etc.)`);
 
   // Verify randomization across resets (seed A vs seed B)
   let diffCount = 0;

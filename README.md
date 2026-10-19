@@ -1,6 +1,6 @@
 # Infinite Boulder Dash
 
-A modern, infinite procedural roguelike reimagining of the 1984 8-bit classic **Boulder Dash**, running natively in the browser with authentic physics, dynamic Drean 16-color palettes, and persistent subterranean exploration.
+A modern, infinite procedural roguelike reimagining of the 1984 8-bit classic **Boulder Dash**, running natively in the browser with authentic physics, dynamic 16-color retro palettes, and persistent subterranean exploration.
 
 ---
 
@@ -39,7 +39,7 @@ This project stands on the shoulders of gaming history and passionate open-sourc
   - 💎 **2,000 Diamonds** — `UNIVERSAL PRODIGY` (+100,000 pts)
   - 💎 **5,000+ Diamonds** — `MISSINGNO.` (+999,999 pts, recurring every 1,000 diamonds)
 
-### 3. Curated Drean 16-Color Harmonic Palettes
+### 3. Curated 16-Color Harmonic Retro Palettes
 - **Beyond C64 Hardware Limits**: The original C64 VIC-II chip forced all character tiles to share global multicolor registers (black, red, dark gray, plus one custom color). *Infinite Boulder Dash* removes this limit.
 - **Independent 4-Color Palettes per Entity**: Rockford, boulders, diamonds, dirt, brick walls, titanium blocks, magic walls, amoeba, fireflies, butterflies, and explosions each possess their own distinct 4-color palette.
 - **Curated Harmonic Themes**: Rather than harsh random noise, every entity draws from curated palettes specifically balanced for **luminance, depth, and material identity**:
@@ -114,14 +114,15 @@ npm test
 ```
 BoulderDash/
 ├── index.html            # Responsive full-window UI and game viewport
-├── style.css             # Glassmorphic dark HUD styling and D-pad controls
+├── css/
+│   └── boulderdash.css   # Dark HUD styling and D-pad controls
 ├── images/
 │   └── sprites.png       # Extracted C64 tile and sprite graphic sheet
 ├── src/
-│   ├── caves.js          # Drean 16-color palette, object definitions, and PRNG
+│   ├── caves.js          # 16-color retro palette, object definitions, and PRNG
 │   ├── engine.js         # Core Boulder Dash physics, milestones, and roguelike state
 │   ├── infinite-world.js # Infinite chunk generator, memory caching, anti-trapping highways
-│   ├── renderer.js       # Canvas 2D renderer, 1/3 deadzone camera, dynamic Drean palettes
+│   ├── renderer.js       # Canvas 2D renderer, 1/3 deadzone camera, dynamic retro palettes
 │   ├── sound.js          # Web Audio C64 sound synthesizer
 │   └── main.js           # Game lifecycle, input loop, and DOM HUD bindings
 ├── test/

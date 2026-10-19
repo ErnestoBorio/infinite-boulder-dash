@@ -63,8 +63,8 @@ for (const key of Object.keys(OBJECT)) {
   OBJECT_BY_CODE[OBJECT[key].code] = OBJECT[key];
 }
 
-// Ernesto Borio's Drean 16-color palette (https://gist.github.com/ErnestoBorio/9bd7b53d298b387df1115ce6dfd1f890)
-export const DREAN_PALETTE = [
+// 16-color retro palette (C64 color scheme)
+export const RETRO_PALETTE = [
   { name: "Black",      hex: "#000000", rgb: 0x000000 }, // 0
   { name: "Blue",       hex: "#0000FF", rgb: 0x0000FF }, // 1
   { name: "Red",        hex: "#FF0000", rgb: 0xFF0000 }, // 2
@@ -83,7 +83,7 @@ export const DREAN_PALETTE = [
   { name: "Dark Gray",  hex: "#575757", rgb: 0x575757 }  // 15
 ];
 
-export const C64_PALETTE = DREAN_PALETTE; // Alias to Drean palette
+export const C64_PALETTE = RETRO_PALETTE;
 
 
 export const CAVE_NAMES = [

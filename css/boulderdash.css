@@ -1,22 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;700&display=swap');
 
 :root {
-  --drean-black: #000000;
-  --drean-blue: #0000FF;
-  --drean-red: #FF0000;
-  --drean-magenta: #FF00FF;
-  --drean-green: #00FF00;
-  --drean-cyan: #00FFFF;
-  --drean-yellow: #FFFF00;
-  --drean-white: #FFFFFF;
-  --drean-skin: #FFDBAC;
-  --drean-brown: #8B4513;
-  --drean-teal: #008080;
-  --drean-violet: #8A2BE2;
-  --drean-skyblue: #87CEEB;
-  --drean-lightred: #FF8080;
-  --drean-lightgray: #ABABAB;
-  --drean-darkgray: #575757;
+  --retro-black: #000000;
+  --retro-blue: #0000FF;
+  --retro-red: #FF0000;
+  --retro-magenta: #FF00FF;
+  --retro-green: #00FF00;
+  --retro-cyan: #00FFFF;
+  --retro-yellow: #FFFF00;
+  --retro-white: #FFFFFF;
+  --retro-skin: #FFDBAC;
+  --retro-brown: #8B4513;
+  --retro-teal: #008080;
+  --retro-violet: #8A2BE2;
+  --retro-skyblue: #87CEEB;
+  --retro-lightred: #FF8080;
+  --retro-lightgray: #ABABAB;
+  --retro-darkgray: #575757;
 }
 
 * {
@@ -29,8 +29,8 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--drean-black);
-  color: var(--drean-white);
+  background-color: var(--retro-black);
+  color: var(--retro-white);
   font-family: 'Outfit', sans-serif;
   user-select: none;
 }
@@ -61,8 +61,8 @@ html, body {
 
 .btn {
   background: rgba(15, 13, 27, 0.85);
-  color: var(--drean-white);
-  border: 1px solid var(--drean-teal);
+  color: var(--retro-white);
+  border: 1px solid var(--retro-teal);
   border-radius: 6px;
   padding: 6px 12px;
   font-family: inherit;
@@ -77,9 +77,9 @@ html, body {
 }
 
 .btn:hover {
-  background: var(--drean-teal);
-  border-color: var(--drean-yellow);
-  color: var(--drean-yellow);
+  background: var(--retro-teal);
+  border-color: var(--retro-yellow);
+  color: var(--retro-yellow);
   box-shadow: 0 0 10px rgba(0, 128, 128, 0.5);
 }
 
@@ -94,8 +94,8 @@ html, body {
   left: 50%;
   transform: translateX(-50%) translateY(-15px);
   background: rgba(15, 13, 27, 0.96);
-  border: 2px solid var(--drean-yellow);
-  color: var(--drean-yellow);
+  border: 2px solid var(--retro-yellow);
+  color: var(--retro-yellow);
   font-family: 'Press Start 2P', monospace;
   font-size: 0.85rem;
   padding: 10px 22px;
@@ -140,7 +140,7 @@ html, body {
 
 .death-card {
   background: #141124;
-  border: 3px solid var(--drean-lightred);
+  border: 3px solid var(--retro-lightred);
   border-radius: 12px;
   padding: 32px 40px;
   max-width: 500px;
@@ -158,13 +158,13 @@ html, body {
 .death-title {
   font-family: 'Press Start 2P', monospace;
   font-size: 1.3rem;
-  color: var(--drean-lightred);
+  color: var(--retro-lightred);
   margin-bottom: 8px;
   text-shadow: 2px 2px 0 #000;
 }
 
 .death-subtitle {
-  color: var(--drean-lightgray);
+  color: var(--retro-lightgray);
   font-size: 0.85rem;
   margin-bottom: 24px;
 }
@@ -186,7 +186,7 @@ html, body {
 
 .stat-label {
   font-size: 0.7rem;
-  color: var(--drean-skyblue);
+  color: var(--retro-skyblue);
   text-transform: uppercase;
   font-weight: 600;
   margin-bottom: 4px;
@@ -195,16 +195,16 @@ html, body {
 .stat-value {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.95rem;
-  color: var(--drean-yellow);
+  color: var(--retro-yellow);
 }
 
 .best-records {
   background: rgba(0, 128, 128, 0.15);
-  border: 1px dashed var(--drean-teal);
+  border: 1px dashed var(--retro-teal);
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 0.75rem;
-  color: var(--drean-lightgray);
+  color: var(--retro-lightgray);
   margin-bottom: 24px;
   display: flex;
   justify-content: space-around;
@@ -213,9 +213,9 @@ html, body {
 .btn-new-run {
   width: 100%;
   padding: 14px;
-  background: var(--drean-teal);
-  border: 2px solid var(--drean-yellow);
-  color: var(--drean-yellow);
+  background: var(--retro-teal);
+  border: 2px solid var(--retro-yellow);
+  color: var(--retro-yellow);
   font-family: 'Press Start 2P', monospace;
   font-size: 0.9rem;
   border-radius: 8px;
@@ -225,8 +225,8 @@ html, body {
 }
 
 .btn-new-run:hover {
-  background: var(--drean-yellow);
-  color: var(--drean-black);
+  background: var(--retro-yellow);
+  color: var(--retro-black);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 255, 0, 0.5);
 }
@@ -238,7 +238,7 @@ html, body {
 .seed-note {
   margin-top: 12px;
   font-size: 0.75rem;
-  color: var(--drean-lightgray);
+  color: var(--retro-lightgray);
   font-style: italic;
 }
 
@@ -262,7 +262,7 @@ html, body {
   border-radius: 8px;
   padding: 8px 14px;
   font-size: 0.8rem;
-  color: var(--drean-lightgray);
+  color: var(--retro-lightgray);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -271,18 +271,18 @@ html, body {
 }
 
 .controls-hint strong {
-  color: var(--drean-yellow);
+  color: var(--retro-yellow);
 }
 
 .key-tag {
   display: inline-block;
   background: rgba(0, 128, 128, 0.3);
-  border: 1px solid var(--drean-teal);
+  border: 1px solid var(--retro-teal);
   border-radius: 4px;
   padding: 1px 6px;
   font-family: monospace;
   font-weight: 700;
-  color: var(--drean-white);
+  color: var(--retro-white);
   font-size: 0.75rem;
 }
 
@@ -311,9 +311,9 @@ html, body {
 
 .dpad-btn {
   background: rgba(15, 13, 27, 0.85);
-  border: 1px solid var(--drean-teal);
+  border: 1px solid var(--retro-teal);
   border-radius: 8px;
-  color: var(--drean-white);
+  color: var(--retro-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -322,8 +322,8 @@ html, body {
 }
 
 .dpad-btn:active {
-  background: var(--drean-teal);
-  color: var(--drean-yellow);
+  background: var(--retro-teal);
+  color: var(--retro-yellow);
 }
 
 .action-pad {
@@ -335,9 +335,9 @@ html, body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--drean-teal);
-  border: 2px solid var(--drean-yellow);
-  color: var(--drean-yellow);
+  background: var(--retro-teal);
+  border: 2px solid var(--retro-yellow);
+  color: var(--retro-yellow);
   font-family: 'Press Start 2P', monospace;
   font-size: 0.65rem;
   display: flex;
@@ -349,6 +349,6 @@ html, body {
 }
 
 .action-btn:active {
-  background: var(--drean-yellow);
-  color: var(--drean-black);
+  background: var(--retro-yellow);
+  color: var(--retro-black);
 }

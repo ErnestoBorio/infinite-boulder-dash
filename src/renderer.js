@@ -1,9 +1,9 @@
 /**
  * Infinite Boulder Dash - Full-Window Canvas 2D Renderer
- * Renders an infinite procedural cave with smooth scrolling, Drean 16-color palette, and clean HUD.
+ * Renders an infinite procedural cave with smooth scrolling, 16-color retro palette, and clean HUD.
  */
 
-import { OBJECT, DIR, DREAN_PALETTE } from './caves.js';
+import { OBJECT, DIR, RETRO_PALETTE } from './caves.js';
 
 /**
  * Deterministic PRNG for seed-based palette generation.
@@ -19,7 +19,7 @@ export function createPRNG(seed) {
 }
 
 /**
- * Curated thematic palettes from Ernesto Borio's 16-color Drean palette.
+ * Curated thematic palettes from 16-color retro palette.
  * Fine-tuned for authentic shape, high contrast, and material identity:
  * - Boulders retain realistic mineral/rock shading (granite, slate, sandstone, basalt, volcanic, limestone, etc.)
  * - Diamonds glitter as sparkling precious gemstones with brilliant glint highlights
@@ -128,7 +128,7 @@ export const ENTITY_THEMES = {
 };
 
 /**
- * Generates independent 4-color Drean palettes for every entity in the game.
+ * Generates independent 4-color retro palettes for every entity in the game.
  * Uses curated harmonic themes to guarantee high visual contrast and material identity
  * (e.g., boulders consistently look like natural minerals/rocks, diamonds glitter).
  */
@@ -143,31 +143,31 @@ export function generateRandomEntityPalettes(seed = null) {
     const indices = themes[themeIdx];
 
     palettes[ent] = [
-      DREAN_PALETTE[indices[0]], // Slot 0 (Black)
-      DREAN_PALETTE[indices[1]], // Slot 1
-      DREAN_PALETTE[indices[2]], // Slot 2
-      DREAN_PALETTE[indices[3]]  // Slot 3
+      RETRO_PALETTE[indices[0]], // Slot 0 (Black)
+      RETRO_PALETTE[indices[1]], // Slot 1
+      RETRO_PALETTE[indices[2]], // Slot 2
+      RETRO_PALETTE[indices[3]]  // Slot 3
     ];
   }
 
   // High-contrast palettes for UI glyphs/fonts
   palettes['fontWhite'] = [
-    DREAN_PALETTE[0],
-    DREAN_PALETTE[7],  // White
-    DREAN_PALETTE[14], // Light Gray
-    DREAN_PALETTE[7]   // White
+    RETRO_PALETTE[0],
+    RETRO_PALETTE[7],  // White
+    RETRO_PALETTE[14], // Light Gray
+    RETRO_PALETTE[7]   // White
   ];
   palettes['fontYellow'] = [
-    DREAN_PALETTE[0],
-    DREAN_PALETTE[6],  // Yellow
-    DREAN_PALETTE[15], // Dark Gray
-    DREAN_PALETTE[7]   // White
+    RETRO_PALETTE[0],
+    RETRO_PALETTE[6],  // Yellow
+    RETRO_PALETTE[15], // Dark Gray
+    RETRO_PALETTE[7]   // White
   ];
   palettes['default'] = [
-    DREAN_PALETTE[0],
-    DREAN_PALETTE[9],  // Brown
-    DREAN_PALETTE[10], // Teal
-    DREAN_PALETTE[14]  // Light Gray
+    RETRO_PALETTE[0],
+    RETRO_PALETTE[9],  // Brown
+    RETRO_PALETTE[10], // Teal
+    RETRO_PALETTE[14]  // Light Gray
   ];
 
   return palettes;
@@ -208,7 +208,7 @@ export class BoulderDashRenderer {
         this.recoloredCanvas.height = img.height;
         this.recoloredCtx = this.recoloredCanvas.getContext('2d');
 
-        this.recolorWithDreanPalette(this.engine ? this.engine.seed : null);
+        this.recolorWithPalette(this.engine ? this.engine.seed : null);
         resolve(img);
       };
       img.onerror = reject;
@@ -237,11 +237,11 @@ export class BoulderDashRenderer {
   }
 
   /**
-   * Recolor spritesheet dynamically using independent 4-color Drean palettes for each entity.
-   * Rockford, boulders, diamonds, dirt, walls, etc. each get their own 4 Drean colors.
+   * Recolor spritesheet dynamically using independent 4-color retro palettes for each entity.
+   * Rockford, boulders, diamonds, dirt, walls, etc. each get their own 4 retro colors.
    * Automatically randomized on every game reset.
    */
-  recolorWithDreanPalette(palettesOrSeed = null) {
+  recolorWithPalette(palettesOrSeed = null) {
     if (!this.spritesLoaded) return;
 
     let palettes;
@@ -461,30 +461,30 @@ export class BoulderDashRenderer {
     ctx.fillStyle = 'rgba(15, 13, 27, 0.90)';
     ctx.fillRect(0, 0, cw, hudHeight);
 
-    // Accent line underneath using Drean Teal
-    ctx.fillStyle = DREAN_PALETTE[10].hex; // Teal
+    // Accent line underneath
+    ctx.fillStyle = RETRO_PALETTE[10].hex; // Teal
     ctx.fillRect(0, hudHeight - 2, cw, 2);
 
     // 1. Diamond icon & Milestone progress
     this.renderSpriteIcon(ctx, OBJECT.DIAMOND.sprite, 14, 6, 32, 32);
 
     ctx.font = '700 15px "Press Start 2P", monospace';
-    ctx.fillStyle = DREAN_PALETTE[6].hex; // Yellow
+    ctx.fillStyle = RETRO_PALETTE[6].hex; // Yellow
     const nextTarget = this.engine.nextMilestone ? this.engine.nextMilestone.count : '∞';
     ctx.fillText(`${this.engine.diamondsCollected}/${nextTarget}`, 52, 28);
 
     // 2. Exploration Depth
     ctx.font = '600 13px "Outfit", sans-serif';
-    ctx.fillStyle = DREAN_PALETTE[12].hex; // Sky Blue
+    ctx.fillStyle = RETRO_PALETTE[12].hex; // Sky Blue
     ctx.fillText(`DEPTH: ${this.engine.maxDepth}m`, 160, 27);
 
     // 3. Seed / Roguelike World
-    ctx.fillStyle = DREAN_PALETTE[14].hex; // Light Gray
+    ctx.fillStyle = RETRO_PALETTE[14].hex; // Light Gray
     ctx.fillText(`SEED: #${this.engine.seed}`, 270, 27);
 
     // 4. Score on the right, safely to the left of the top-toolbar (which is docked at right: 16px)
     ctx.font = '700 15px "Press Start 2P", monospace';
-    ctx.fillStyle = DREAN_PALETTE[7].hex; // White
+    ctx.fillStyle = RETRO_PALETTE[7].hex; // White
     const scoreStr = String(this.engine.score).padStart(6, '0');
     const scoreText = `SCORE ${scoreStr}`;
     const scoreWidth = ctx.measureText(scoreText).width;
