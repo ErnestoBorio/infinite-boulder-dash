@@ -141,7 +141,10 @@ import('../src/renderer.js').then(({ generateRandomEntityPalettes }) => {
       }
     }
   }
-  console.log(`✓ Verified independent 4-color retro palettes for all 11 entities (Rockford, boulders, diamonds, etc.)`);
+  if (palettesA.brickwall !== palettesA.magicwall) {
+    throw new Error('Expected brickwall and magicwall to share the exact same palette!');
+  }
+  console.log(`✓ Verified brick walls and magic walls share the same palette`);
 
   // Verify randomization across resets (seed A vs seed B)
   let diffCount = 0;

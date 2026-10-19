@@ -92,13 +92,7 @@ export const ENTITY_THEMES = {
     [0, 15, 12, 7], // Chrome: Dark Gray, Sky Blue, White
     [0, 15, 11, 14] // Tungsten / Obsidian Alloy: Dark Gray, Violet, Light Gray
   ],
-  magicwall: [
-    [0, 11, 3, 7],  // Arcane Violet: Violet, Magenta, White
-    [0, 10, 5, 7],  // Mystic Cyan: Teal, Cyan, White
-    [0, 2, 6, 7],   // Solar Flare: Red, Yellow, White
-    [0, 1, 12, 7],  // Frost Magic: Blue, Sky Blue, White
-    [0, 4, 5, 7]    // Emerald Glow: Green, Cyan, White
-  ],
+  // Note: magicwall shares the exact same palette as brickwall
   amoeba: [
     [0, 4, 10, 6],  // Toxic Slime: Green, Teal, Yellow
     [0, 5, 12, 7],  // Bioluminescent Jelly: Cyan, Sky Blue, White
@@ -149,6 +143,9 @@ export function generateRandomEntityPalettes(seed = null) {
       RETRO_PALETTE[indices[3]]  // Slot 3
     ];
   }
+
+  // Magic walls share the exact same palette as brick walls
+  palettes['magicwall'] = palettes['brickwall'];
 
   // High-contrast palettes for UI glyphs/fonts
   palettes['fontWhite'] = [
@@ -246,7 +243,10 @@ export class BoulderDashRenderer {
 
     let palettes;
     if (palettesOrSeed && typeof palettesOrSeed === 'object' && !Array.isArray(palettesOrSeed) && palettesOrSeed.rockford) {
-      palettes = palettesOrSeed;
+      palettes = Object.assign({}, palettesOrSeed);
+      if (palettes.brickwall) {
+        palettes.magicwall = palettes.brickwall;
+      }
     } else {
       const seed = (palettesOrSeed != null) ? palettesOrSeed : (this.engine ? this.engine.seed : Math.floor(Math.random() * 1000000000));
       palettes = generateRandomEntityPalettes(seed);
