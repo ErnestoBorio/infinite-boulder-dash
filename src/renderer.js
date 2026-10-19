@@ -72,10 +72,11 @@ export const ENTITY_THEMES = {
     [0, 9, 2, 13],  // Red Clay: Brown, Red, Light Red
     [0, 15, 9, 14], // Cavern Peat: Dark Gray, Brown, Light Gray
     [0, 9, 15, 10], // Mossy Grotto: Brown, Dark Gray, Teal
-    [0, 9, 6, 8],   // Sandy Subsoil: Brown, Yellow, Light Skin
+    [0, 9, 8, 14],  // Sandy Loam: Brown, Light Skin, Light Gray
     [0, 15, 2, 13], // Volcanic Ash: Dark Gray, Red, Light Red
     [0, 15, 11, 14],// Deep Strata: Dark Gray, Violet, Light Gray
-    [0, 15, 10, 12] // Glacial Permafrost: Dark Gray, Teal, Sky Blue
+    [0, 15, 10, 12], // Glacial Permafrost: Dark Gray, Teal, Sky Blue
+    [0, 9, 15, 14]  // Rich Humus: Brown, Dark Gray, Light Gray
   ],
   brickwall: [
     [0, 9, 2, 13],  // Terracotta: Brown, Red, Light Red
