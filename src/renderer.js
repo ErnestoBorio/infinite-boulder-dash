@@ -466,8 +466,11 @@ export class BoulderDashRenderer {
     const minCellY = Math.floor(this.camera.y / ts) - 1;
     const maxCellY = Math.ceil((this.camera.y + ch) / ts) + 1;
 
-    // Check if empty space should flash white on this frame during milestone celebration (~14Hz rapid strobe)
-    this.spaceFlashWhite = (this.engine.flashFrames > 0) && (Math.floor(this.animTime * 14) % 2 === 0);
+    // Check if C64 milestone celebration flash is active
+    const isFlashing = (this.engine.flashFrames > 0);
+    const strobePhase = Math.floor(this.animTime * 14) % 2; // ~14Hz VIC-II strobe alternation
+    this.isStrobeOn = isFlashing && (strobePhase === 0);
+    this.spaceFlashWhite = this.isStrobeOn;
 
     // Render all visible cells (automatically generates & stores in memory any newly explored chunks)
     for (let y = minCellY; y <= maxCellY; y++) {
@@ -480,6 +483,13 @@ export class BoulderDashRenderer {
       }
     }
 
+    // Authentic C64 Full-Screen VIC-II Flash Strobe
+    if (this.isStrobeOn) {
+      // Replicates the global VIC-II $D020 (border) & $D021 (background) flash pulse across the viewport
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
+      ctx.fillRect(0, 0, cw, ch);
+    }
+
     // When Rockford dies, subtly darken the screen without blacking it out
     if (this.engine.lost) {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
@@ -490,12 +500,39 @@ export class BoulderDashRenderer {
     this.renderHUD(ctx, cw, ch);
   }
 
+  /**
+   * Recreates the authentic Commodore 64 "tunnels glisten with lines" milestone effect.
+   * In original C64 Boulder Dash, when an extra life / milestone was earned,
+   * empty dug tunnels shimmered with horizontal VIC-II raster beam scanlines.
+   */
+  renderGlisteningTunnel(ctx, sx, sy, sw, sh, isStrobeOn) {
+    const lineSpacing = 4;
+    const shimmerOffset = Math.floor(this.animTime * 24) % lineSpacing;
+
+    // Scanlines align globally to screen Y coordinate so adjacent cells form seamless continuous raster stripes
+    const startY = sy + ((lineSpacing - (sy % lineSpacing) + shimmerOffset) % lineSpacing);
+    const endY = sy + sh;
+
+    for (let y = startY; y < endY; y += lineSpacing) {
+      const lineIdx = Math.floor(y / lineSpacing);
+      const colorCycle = (lineIdx + Math.floor(this.animTime * 16)) % 3;
+
+      if (isStrobeOn) {
+        // High-intensity retro beam during active strobe phase: White, Cyan, Yellow
+        ctx.fillStyle = (colorCycle === 0) ? '#FFFFFF' : ((colorCycle === 1) ? '#80FFFF' : '#FFFF80');
+      } else {
+        // Shimmering phosphorescent raster lines during alternate phase
+        ctx.fillStyle = (colorCycle === 0) ? '#D0D0D0' : ((colorCycle === 1) ? '#00B4D8' : '#D4AF37');
+      }
+      ctx.fillRect(sx, y, sw, 2);
+    }
+  }
+
   renderCell(ctx, cell, sx, sy, sw, sh) {
     const obj = cell.object;
     if (obj === OBJECT.SPACE) {
-      if (this.spaceFlashWhite) {
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(Math.round(sx), Math.round(sy), sw, sh);
+      if (this.engine.flashFrames > 0) {
+        this.renderGlisteningTunnel(ctx, Math.round(sx), Math.round(sy), sw, sh, this.isStrobeOn);
       }
       return;
     }

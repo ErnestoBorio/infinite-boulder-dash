@@ -178,23 +178,34 @@ class SoundFX {
     this.ensureContext();
     if (!this.ctx) return;
 
-    const notes = [523.25, 659.25, 783.99, 1046.5];
+    // Classic Commodore 64 ascending arpeggio fanfare (C5, E5, G5, C6, E6)
+    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
     notes.forEach((freq, idx) => {
-      const t = this.ctx.currentTime + idx * 0.07;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
+      const t = this.ctx.currentTime + idx * 0.065;
 
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, t);
+      // Voice 1: Crisp triangle lead core
+      const osc1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(freq, t);
+      gain1.gain.setValueAtTime(0.32, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+      osc1.connect(gain1);
+      gain1.connect(this.masterGain);
+      osc1.start(t);
+      osc1.stop(t + 0.14);
 
-      gain.gain.setValueAtTime(0.35, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-
-      osc.connect(gain);
-      gain.connect(this.masterGain);
-
-      osc.start(t);
-      osc.stop(t + 0.12);
+      // Voice 2: SID 6581 characteristic harmonic overtone
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(freq * 2, t);
+      gain2.gain.setValueAtTime(0.06, t);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      osc2.connect(gain2);
+      gain2.connect(this.masterGain);
+      osc2.start(t);
+      osc2.stop(t + 0.09);
     });
   }
 
