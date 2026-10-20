@@ -486,12 +486,6 @@ export class BoulderDashRenderer {
       }
     }
 
-    // When Rockford dies, subtly darken the screen without blacking it out
-    if (this.engine.lost) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
-      ctx.fillRect(0, 0, cw, ch);
-    }
-
     // Draw Top HUD Bar
     this.renderHUD(ctx, cw, ch);
   }

@@ -77,6 +77,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  let deathTimeout = null;
+
   function handleDeath(stats) {
     // Update local storage records
     if (stats.score > highScore) {
@@ -96,15 +98,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     deathDepthEl.textContent = `${stats.depth}m`;
     deathTimeEl.textContent = `${stats.time}s`;
 
-    // Display expedition summary modal smoothly after explosion
-    setTimeout(() => {
+    // Display expedition summary modal smoothly after a delay following Rockford's death
+    if (deathTimeout) {
+      clearTimeout(deathTimeout);
+    }
+    deathTimeout = setTimeout(() => {
       if (engine.lost) {
         deathModal.classList.add('visible');
       }
-    }, 600);
+    }, 1500);
   }
 
   function startNewRun() {
+    if (deathTimeout) {
+      clearTimeout(deathTimeout);
+      deathTimeout = null;
+    }
     deathModal.classList.remove('visible');
     // Roguelike: always rolls a completely new random world seed!
     engine.reset();
