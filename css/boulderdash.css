@@ -62,16 +62,6 @@ html, body {
   text-decoration: none;
   cursor: pointer;
   outline: none;
-  transition: transform 0.15s ease, filter 0.15s ease;
-}
-
-#hud-title-link:hover {
-  transform: translateX(-50%) scale(1.03);
-  filter: drop-shadow(0 0 10px rgba(0, 192, 192, 0.7));
-}
-
-#hud-title-link:active {
-  transform: translateX(-50%) scale(0.97);
 }
 
 #hud-title-img {
