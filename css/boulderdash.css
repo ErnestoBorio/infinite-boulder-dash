@@ -48,6 +48,52 @@ html, body {
   z-index: 1;
 }
 
+/* Center HUD Title Link: Interactive link to itch.io page */
+#hud-title-link {
+  position: fixed;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+#hud-title-link:hover {
+  transform: translateX(-50%) scale(1.03);
+  filter: drop-shadow(0 0 10px rgba(0, 192, 192, 0.7));
+}
+
+#hud-title-link:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+#hud-title-img {
+  height: 100%;
+  width: auto;
+  max-width: calc(100vw - 460px);
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media (max-width: 600px) {
+  #hud-title-link {
+    height: 24px;
+    top: 10px;
+  }
+  #hud-title-img {
+    max-width: calc(100vw - 280px);
+  }
+}
+
 /* Floating Top Controls Toolbar: Docked cleanly at top right */
 .top-toolbar {
   position: fixed;
@@ -102,32 +148,49 @@ a.btn {
   }
 }
 
-/* Floating Milestone & Event Message Banner: Positioned at TOP, NEVER covering Rockford */
+/* Floating Milestone & Event Message Sign: Displays out of the way below Rockford and stays in place */
 #message-banner {
   position: fixed;
-  top: 56px; /* Just below top HUD bar */
-  left: 50%;
-  transform: translateX(-50%) translateY(-15px);
-  background: rgba(15, 13, 27, 0.96);
+  top: 0;
+  left: 0;
+  transform: translateX(-50%) translateY(6px) scale(0.95);
+  background: rgba(15, 13, 27, 0.92);
   border: 2px solid var(--retro-yellow);
   color: var(--retro-yellow);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.85rem;
-  padding: 10px 22px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  padding: 8px 16px;
   border-radius: 8px;
   pointer-events: none;
   opacity: 0;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-shadow: 2px 2px 0px #000;
   z-index: 100;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 0, 0.25);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.85), 0 0 16px rgba(255, 255, 0, 0.35);
   white-space: nowrap;
+  backdrop-filter: blur(4px);
+  max-width: 90vw;
 }
 
 #message-banner.visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.milestone-title {
+  color: var(--retro-yellow);
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+}
+
+.milestone-sub {
+  display: block;
+  font-size: 0.62rem;
+  color: var(--retro-white);
+  margin-top: 4px;
+  letter-spacing: 0.5px;
 }
 
 /* Roguelike Death / Game Over Modal: Only subtly darkens the screen */

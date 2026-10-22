@@ -91,6 +91,41 @@ if (starterVariantsSeen.size < 3) {
 }
 console.log(`✓ Verified ${starterVariantsSeen.size} distinct starter hub archetypes across seeds`);
 
+// Test Predefined Macro-Structure: 10x10 Transmutation Hall with Magic Wall & Boulders
+const hallWorld = new InfiniteWorld(1);
+const hallChunk = hallWorld.getChunk(-4, -3); // Seed 1 generates Cluster 6 at (-4, -3)
+if (hallChunk[8][5].object !== OBJECT.MAGICWALL || hallChunk[3][3].object !== OBJECT.BRICKWALL) {
+  throw new Error('Expected 10x10 Transmutation Hall cluster at chunk (-4, -3)!');
+}
+// Check 10x10 walls & doorways
+for (let ly = 3; ly <= 12; ly++) {
+  for (let lx = 3; lx <= 12; lx++) {
+    const isDoor = (ly === 3 && (lx === 7 || lx === 8)) || (ly === 12 && (lx === 7 || lx === 8));
+    if (lx === 3 || lx === 12 || ly === 3 || ly === 12) {
+      const expected = isDoor ? OBJECT.SPACE : OBJECT.BRICKWALL;
+      if (hallChunk[ly][lx].object !== expected) {
+        throw new Error(`Hall perimeter mismatch at (${lx}, ${ly}): expected ${expected.name}, got ${hallChunk[ly][lx].object.name}`);
+      }
+    }
+  }
+}
+// Check central magic wall and primed boulders
+for (let lx = 5; lx <= 10; lx++) {
+  if (hallChunk[8][lx].object !== OBJECT.MAGICWALL) {
+    throw new Error(`Expected MAGICWALL at (lx=${lx}, ly=8)`);
+  }
+}
+let hallBoulders = 0;
+for (let ly = 4; ly <= 6; ly++) {
+  for (let lx = 6; lx <= 9; lx++) {
+    if (hallChunk[ly][lx].object === OBJECT.BOULDER) hallBoulders++;
+  }
+}
+if (hallBoulders !== 12) {
+  throw new Error(`Expected 12 primed boulders above magic wall, got ${hallBoulders}`);
+}
+console.log(`✓ Verified 10x10 Transmutation Hall cluster (perimeter walls, top/bottom openings, magic wall & ${hallBoulders} boulders)`);
+
 // 3. Test Engine with Infinite World
 const engine = new BoulderDashEngine({ seed: 100 });
 // Advance until Rockford spawns

@@ -68,15 +68,12 @@ export const ENTITY_THEMES = {
     [0, 2, 6, 7]    // Sunstone: Red, Yellow, White
   ],
   dirt: [
-    [0, 9, 15, 8],  // Classic Earth: Brown, Dark Gray, Light Skin
+    [0, 9, 15, 14], // Classic Earth / Rich Humus: Brown, Dark Gray, Light Gray
     [0, 9, 2, 13],  // Red Clay: Brown, Red, Light Red
     [0, 15, 9, 14], // Cavern Peat: Dark Gray, Brown, Light Gray
     [0, 9, 15, 10], // Mossy Grotto: Brown, Dark Gray, Teal
-    [0, 9, 8, 14],  // Sandy Loam: Brown, Light Skin, Light Gray
-    [0, 15, 2, 13], // Volcanic Ash: Dark Gray, Red, Light Red
     [0, 15, 11, 14],// Deep Strata: Dark Gray, Violet, Light Gray
-    [0, 15, 10, 12], // Glacial Permafrost: Dark Gray, Teal, Sky Blue
-    [0, 9, 15, 14]  // Rich Humus: Brown, Dark Gray, Light Gray
+    [0, 15, 10, 12] // Glacial Permafrost: Dark Gray, Teal, Sky Blue
   ],
   brickwall: [
     [0, 9, 2, 13],  // Terracotta: Brown, Red, Light Red
@@ -218,7 +215,7 @@ export class BoulderDashRenderer {
     });
   }
 
-  async loadTitle(src = 'images/title.png') {
+  async loadTitle(src = 'images/infinite-boulder-dash.png') {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
@@ -288,8 +285,15 @@ export class BoulderDashRenderer {
         }
       };
       img.onerror = () => {
-        if (src !== 'Boulder dash title.png') {
-          this.loadTitle('Boulder dash title.png').then(resolve);
+        const fallbacks = [
+          'infinite-boulder-dash.png',
+          'images/IBD.png',
+          'IBD.png',
+          'images/title.png'
+        ];
+        const next = fallbacks.find((f) => f !== src);
+        if (next) {
+          this.loadTitle(next).then(resolve);
         } else {
           this.titleImageLoaded = false;
           resolve(null);
@@ -405,6 +409,16 @@ export class BoulderDashRenderer {
     this.canvas.width = this.width * dpr;
     this.canvas.height = this.height * dpr;
     this.ctx.scale(dpr, dpr);
+  }
+
+  getRockfordScreenPos() {
+    const ts = this.tileSize;
+    const px = (this.engine.rockford ? this.engine.rockford.x + 0.5 : (this.engine.deathPos ? this.engine.deathPos.x + 0.5 : 4.5)) * ts;
+    const py = (this.engine.rockford ? this.engine.rockford.y + 0.5 : (this.engine.deathPos ? this.engine.deathPos.y + 0.5 : 4.5)) * ts;
+    return {
+      x: Math.round(px - this.camera.x),
+      y: Math.round(py - this.camera.y)
+    };
   }
 
   render(deltaTime = 0) {
@@ -576,27 +590,9 @@ export class BoulderDashRenderer {
       ctx.fillText(`SEED: #${this.engine.seed}`, leftOffset, 27);
     }
 
-    // 4. Center Title Image (Boulder dash title.png)
-    if (this.titleImageLoaded && this.titleImage) {
-      const origW = this.titleImage.width || 494;
-      const origH = this.titleImage.height || 80;
-      const aspect = origW / origH;
-      let targetH = 34;
-      let targetW = Math.round(targetH * aspect);
-
-      const maxCenterSpace = Math.max(120, cw - 440);
-      if (targetW > maxCenterSpace) {
-        targetW = maxCenterSpace;
-        targetH = Math.round(targetW / aspect);
-      }
-
-      const titleX = Math.round((cw - targetW) / 2);
-      const titleY = Math.round((hudHeight - targetH) / 2);
-
-      ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(this.titleImage, titleX, titleY, targetW, targetH);
-      ctx.imageSmoothingEnabled = false;
-    }
+    // 4. Center Title Spacing (Rendered interactively via #hud-title-link in the DOM)
+    const targetW = Math.min(276, Math.max(120, cw - 460));
+    const titleRight = Math.round((cw + targetW) / 2);
 
     // 5. Score on the right, safely to the left of the top-toolbar (which is docked at right: 16px)
     ctx.font = '700 15px "Press Start 2P", monospace';
@@ -605,8 +601,8 @@ export class BoulderDashRenderer {
     const scoreText = `SCORE ${scoreStr}`;
     const scoreWidth = ctx.measureText(scoreText).width;
     const toolbarMargin = (cw >= 800) ? 315 : 250; // Reserved width for top toolbar buttons
-    const scoreX = Math.max(cw - toolbarMargin - scoreWidth - 16, Math.round((cw + 260) / 2));
-    if (cw >= 600 || scoreX > (cw / 2 + 100)) {
+    const scoreX = Math.max(cw - toolbarMargin - scoreWidth - 16, titleRight + 16);
+    if (cw >= 600 && scoreX + scoreWidth <= cw - toolbarMargin + 25) {
       ctx.fillText(scoreText, scoreX, 28);
     }
   }

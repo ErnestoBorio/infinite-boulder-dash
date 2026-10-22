@@ -249,7 +249,7 @@ export class InfiniteWorld {
     const clusterRoll = randFloat(cx, cy, this.seed + 777);
     if (clusterRoll >= 0.42) return; // ~42% of chunks contain a macro-structure cluster
 
-    const clusterType = Math.abs(hashCoords(cx, cy, this.seed + 8888)) % 6;
+    const clusterType = Math.abs(hashCoords(cx, cy, this.seed + 8888)) % 7;
 
     switch (clusterType) {
       case 0:
@@ -411,6 +411,45 @@ export class InfiniteWorld {
           // Clear space below magic wall for transmuted diamonds
           this.setChunkCell(chunk, x, 9, OBJECT.SPACE);
           this.setChunkCell(chunk, x, 10, OBJECT.SPACE);
+        }
+        break;
+
+      case 6:
+        // Cluster 6: Transmutation Hall (10x10 enclosed hall, top/bottom openings, central magic wall with boulders above)
+        // 1. Build 10x10 perimeter brick walls (lx: 3..12, ly: 3..12) and clear the interior to empty space
+        for (let ly = 3; ly <= 12; ly++) {
+          for (let lx = 3; lx <= 12; lx++) {
+            if (lx === 3 || lx === 12 || ly === 3 || ly === 12) {
+              this.setChunkCell(chunk, lx, ly, OBJECT.BRICKWALL);
+            } else {
+              this.setChunkCell(chunk, lx, ly, OBJECT.SPACE);
+            }
+          }
+        }
+
+        // 2. Openings to get in and out at top and bottom walls
+        this.setChunkCell(chunk, 7, 3, OBJECT.SPACE);
+        this.setChunkCell(chunk, 8, 3, OBJECT.SPACE);
+        this.setChunkCell(chunk, 7, 2, OBJECT.SPACE); // Clear approach outside top door
+        this.setChunkCell(chunk, 8, 2, OBJECT.SPACE);
+
+        this.setChunkCell(chunk, 7, 12, OBJECT.SPACE);
+        this.setChunkCell(chunk, 8, 12, OBJECT.SPACE);
+        this.setChunkCell(chunk, 7, 13, OBJECT.SPACE); // Clear approach outside bottom door
+        this.setChunkCell(chunk, 8, 13, OBJECT.SPACE);
+
+        // 3. Central Magic Wall in the middle of the hall (ly = 8)
+        // Spans lx = 5..10, leaving lx = 4 and lx = 11 as open lateral walkways
+        for (let x = 5; x <= 10; x++) {
+          this.setChunkCell(chunk, x, 8, OBJECT.MAGICWALL);
+        }
+
+        // 4. Boulders primed above the magic wall (ly = 4..6, lx = 6..9)
+        // ly = 7 remains OBJECT.SPACE so boulders immediately start falling through the magic wall
+        for (let y = 4; y <= 6; y++) {
+          for (let x = 6; x <= 9; x++) {
+            this.setChunkCell(chunk, x, y, OBJECT.BOULDER);
+          }
         }
         break;
     }

@@ -31,13 +31,44 @@ window.addEventListener('DOMContentLoaded', async () => {
   bestDepthEl.textContent = `${bestDepth}m`;
 
   let bannerTimeout = null;
-  function showMessage(text, duration = 2500) {
+  function showMessage(content, duration = 2500) {
     if (bannerTimeout) clearTimeout(bannerTimeout);
-    messageBanner.textContent = text;
+    if (typeof content === 'string' && (content.includes('<') || content.includes('\n'))) {
+      messageBanner.innerHTML = content;
+    } else {
+      messageBanner.textContent = content;
+    }
+    updateMessageBannerPosition();
     messageBanner.classList.add('visible');
     bannerTimeout = setTimeout(() => {
       messageBanner.classList.remove('visible');
     }, duration);
+  }
+
+  function updateMessageBannerPosition() {
+    if (!renderer) return;
+
+    const pos = renderer.getRockfordScreenPos();
+    const cw = window.innerWidth;
+    const ch = window.innerHeight;
+
+    const bannerW = messageBanner.offsetWidth || 320;
+    const bannerH = messageBanner.offsetHeight || 44;
+    const halfW = bannerW / 2;
+
+    // Horizontally center at Rockford, clamped within screen margins
+    const targetX = Math.max(halfW + 12, Math.min(cw - halfW - 12, pos.x));
+
+    // Position out of the way below Rockford (pos.y + 16 is feet, + 20px clearance = pos.y + 36)
+    let targetY = pos.y + 36;
+    if (targetY + bannerH > ch - 16) {
+      // Flip above Rockford if viewport bottom is cramped
+      targetY = pos.y - 20 - bannerH;
+    }
+    targetY = Math.max(54, targetY);
+
+    messageBanner.style.left = `${Math.round(targetX)}px`;
+    messageBanner.style.top = `${Math.round(targetY)}px`;
   }
 
   let renderer = null;
@@ -67,8 +98,12 @@ window.addEventListener('DOMContentLoaded', async () => {
           break;
         case 'milestone_reached':
           sound.playQuotaReached();
-          // Milestone notification placed neatly at the top of the screen
-          showMessage(`★ MILESTONE: ${data.count} DIAMONDS! ${data.title} (+${data.bonus.toLocaleString()} PTS) ★`, 3500);
+          // Milestone notification sign shown directly below Rockford
+          showMessage(
+            `<div class="milestone-title">★ MILESTONE: ${data.count} DIAMONDS! ★</div>` +
+            `<div class="milestone-sub">${data.title} (+${data.bonus.toLocaleString()} PTS)</div>`,
+            3500
+          );
           break;
         case 'rockford_died':
           handleDeath(data);
@@ -80,6 +115,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   let deathTimeout = null;
 
   function handleDeath(stats) {
+    if (bannerTimeout) {
+      clearTimeout(bannerTimeout);
+      bannerTimeout = null;
+    }
+    messageBanner.classList.remove('visible');
+
     // Update local storage records
     if (stats.score > highScore) {
       highScore = stats.score;
@@ -110,6 +151,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   function startNewRun() {
+    if (bannerTimeout) {
+      clearTimeout(bannerTimeout);
+      bannerTimeout = null;
+    }
+    messageBanner.classList.remove('visible');
+
     if (deathTimeout) {
       clearTimeout(deathTimeout);
       deathTimeout = null;
@@ -131,7 +178,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     await Promise.all([
       renderer.loadSprites('images/sprites.png'),
-      renderer.loadTitle('images/title.png')
+      renderer.loadTitle('images/infinite-boulder-dash.png')
     ]);
     renderer.recolorWithPalette(engine.seed);
     console.log('Sprites and title loaded, entity palettes randomized for seed #' + engine.seed);

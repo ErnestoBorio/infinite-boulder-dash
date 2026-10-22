@@ -12,8 +12,13 @@
   <!-- Fullscreen Rendering Canvas -->
   <canvas id="game-canvas"></canvas>
 
-  <!-- Floating Milestone & Event Message Banner (Top of Screen, not covering player) -->
+  <!-- Floating Milestone & Event Message Sign (Positioned dynamically below Rockford) -->
   <div id="message-banner"></div>
+
+  <!-- Center HUD Title Link -->
+  <a id="hud-title-link" href="https://drean64.itch.io/infinite-boulder-dash" target="_blank" rel="noopener noreferrer" title="Play Infinite Boulder Dash on itch.io" aria-label="Infinite Boulder Dash on itch.io">
+    <img id="hud-title-img" src="images/infinite-boulder-dash.png" alt="Infinite Boulder Dash" onerror="if (this.src.indexOf('infinite-boulder-dash.png') !== -1 && !this._tried) { this._tried = true; this.src = 'infinite-boulder-dash.png'; }" />
+  </a>
 
   <!-- Floating Top Controls Toolbar -->
   <div class="top-toolbar">
