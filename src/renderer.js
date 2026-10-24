@@ -31,6 +31,8 @@ export function createPRNG(seed) {
  */
 export const ENTITY_THEMES = {
   rockford: [
+    [0, 5, 4, 10],  // Toxic Explorer: Cyan pants, Bright Green skin, Dark Green shirt
+    [0, 7, 14, 0],   // Noir / Phantom: White pants, Light Gray skin, Black shirt
     [0, 1, 8, 2],   // Classic Explorer: Blue pants, Light Skin face, Red shirt
     [0, 1, 6, 1],   // Blue Miner: Blue pants, Yellow skin, Blue shirt
     [0, 1, 7, 2],   // Retro 1984 Rockford: Blue pants, White skin, Red shirt
@@ -42,9 +44,7 @@ export const ENTITY_THEMES = {
     [0, 15, 8, 2],  // Lava Diver: Dark Gray pants, Light Skin face, Red shirt
     [0, 9, 8, 4],   // Forest Ranger: Brown pants, Light Skin face, Green shirt
     [0, 14, 12, 7], // Hazmat Operative: Light Gray suit, Sky Blue visor, White helmet
-    [0, 15, 8, 14], // Stealth Miner: Dark Gray suit, Light Skin face, Light Gray vest
-    [0, 5, 4, 10],  // Toxic Explorer: Cyan pants, Bright Green skin, Dark Green shirt
-    [0, 7, 14, 0]   // Noir / Phantom: White pants, Light Gray skin, Black shirt
+    [0, 15, 8, 14]  // Stealth Miner: Dark Gray suit, Light Skin face, Light Gray vest
   ],
   boulder: [
     [0, 14, 15, 7], // Classic Granite: Light Gray midtone, Dark Gray shadow, White rim
@@ -406,6 +406,22 @@ export class BoulderDashRenderer {
 
   cycleRockfordPalette() {
     const themes = ENTITY_THEMES.rockford;
+    const themeNames = [
+      "Toxic Explorer (Cyan pants, Bright Green skin, Dark Green shirt)",
+      "Noir / Phantom (White pants, Light Gray skin, Black shirt)",
+      "Classic Explorer (Blue pants, Light Skin face, Red shirt)",
+      "Blue Miner (Blue pants, Yellow skin, Blue shirt)",
+      "Retro 1984 (Blue pants, White skin, Red shirt)",
+      "Spelunker Pro (Dark Gray pants, Light Skin face, Yellow shirt)",
+      "Arctic Adventurer (Blue pants, Light Skin face, White parka)",
+      "Desert Scavenger (Brown pants, Light Skin face, Light Red shirt)",
+      "Neon Cyberminer (Violet pants, Light Skin face, Cyan shirt)",
+      "Deep Cavernier (Teal pants, Light Skin face, Light Gray shirt)",
+      "Lava Diver (Dark Gray pants, Light Skin face, Red shirt)",
+      "Forest Ranger (Brown pants, Light Skin face, Green shirt)",
+      "Hazmat Operative (Light Gray suit, Sky Blue visor, White helmet)",
+      "Stealth Miner (Dark Gray suit, Light Skin face, Light Gray vest)"
+    ];
     this.rockfordThemeIdx = ((this.rockfordThemeIdx ?? -1) + 1) % themes.length;
     const indices = themes[this.rockfordThemeIdx];
     const newPalettes = Object.assign({}, this.currentPalettes || generateRandomEntityPalettes(this.engine ? this.engine.seed : null));
@@ -419,6 +435,7 @@ export class BoulderDashRenderer {
     return {
       index: this.rockfordThemeIdx,
       total: themes.length,
+      name: themeNames[this.rockfordThemeIdx] || `Theme ${this.rockfordThemeIdx + 1}`,
       palette: newPalettes.rockford
     };
   }
