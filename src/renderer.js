@@ -32,7 +32,7 @@ export function createPRNG(seed) {
 export const ENTITY_THEMES = {
   rockford: [
     [0, 5, 4, 10],  // Toxic Explorer: Cyan pants, Bright Green skin, Dark Green shirt
-    [0, 7, 14, 0],   // Noir / Phantom: White pants, Light Gray skin, Black shirt
+    [0, 7, 14, 15],  // Noir / Phantom: White pants, Light Gray skin, Dark Gray shirt
     [0, 1, 8, 2],   // Classic Explorer: Blue pants, Light Skin face, Red shirt
     [0, 1, 6, 1],   // Blue Miner: Blue pants, Yellow skin, Blue shirt
     [0, 1, 7, 2],   // Retro 1984 Rockford: Blue pants, White skin, Red shirt
@@ -408,7 +408,7 @@ export class BoulderDashRenderer {
     const themes = ENTITY_THEMES.rockford;
     const themeNames = [
       "Toxic Explorer (Cyan pants, Bright Green skin, Dark Green shirt)",
-      "Noir / Phantom (White pants, Light Gray skin, Black shirt)",
+      "Noir / Phantom (White pants, Light Gray skin, Dark Gray shirt)",
       "Classic Explorer (Blue pants, Light Skin face, Red shirt)",
       "Blue Miner (Blue pants, Yellow skin, Blue shirt)",
       "Retro 1984 (Blue pants, White skin, Red shirt)",
