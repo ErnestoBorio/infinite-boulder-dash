@@ -73,8 +73,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   let renderer = null;
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const seedParam = urlParams.get('seed');
+  const initialSeed = seedParam && !isNaN(parseInt(seedParam, 10)) ? parseInt(seedParam, 10) : undefined;
+
   // Create Infinite Engine
   const engine = new BoulderDashEngine({
+    seed: initialSeed,
     onEvent: (event, data) => {
       switch (event) {
         case 'level_loaded':
@@ -233,6 +238,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       startNewRun();
     } else if (e.code === 'KeyM') {
       toggleSound();
+    } else if (e.code === 'KeyP') {
+      if (renderer) {
+        const info = renderer.cycleRockfordPalette();
+        const p = info.palette;
+        showMessage(`ROCKFORD [${info.index + 1}/${info.total}]: Pants ${p[1].name}, Skin ${p[2].name}, Shirt ${p[3].name}`, 2500);
+      }
     }
 
     updateInput();

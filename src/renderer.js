@@ -42,7 +42,9 @@ export const ENTITY_THEMES = {
     [0, 15, 8, 2],  // Lava Diver: Dark Gray pants, Light Skin face, Red shirt
     [0, 9, 8, 4],   // Forest Ranger: Brown pants, Light Skin face, Green shirt
     [0, 14, 12, 7], // Hazmat Operative: Light Gray suit, Sky Blue visor, White helmet
-    [0, 15, 8, 14]  // Stealth Miner: Dark Gray suit, Light Skin face, Light Gray vest
+    [0, 15, 8, 14], // Stealth Miner: Dark Gray suit, Light Skin face, Light Gray vest
+    [0, 5, 4, 10],  // Toxic Explorer: Cyan pants, Bright Green skin, Dark Green shirt
+    [0, 7, 14, 0]   // Noir / Phantom: White pants, Light Gray skin, Black shirt
   ],
   boulder: [
     [0, 14, 15, 7], // Classic Granite: Light Gray midtone, Dark Gray shadow, White rim
@@ -400,6 +402,25 @@ export class BoulderDashRenderer {
     }
 
     this.recoloredCtx.putImageData(imgData, 0, 0);
+  }
+
+  cycleRockfordPalette() {
+    const themes = ENTITY_THEMES.rockford;
+    this.rockfordThemeIdx = ((this.rockfordThemeIdx ?? -1) + 1) % themes.length;
+    const indices = themes[this.rockfordThemeIdx];
+    const newPalettes = Object.assign({}, this.currentPalettes || generateRandomEntityPalettes(this.engine ? this.engine.seed : null));
+    newPalettes.rockford = [
+      RETRO_PALETTE[indices[0]],
+      RETRO_PALETTE[indices[1]],
+      RETRO_PALETTE[indices[2]],
+      RETRO_PALETTE[indices[3]]
+    ];
+    this.recolorWithPalette(newPalettes);
+    return {
+      index: this.rockfordThemeIdx,
+      total: themes.length,
+      palette: newPalettes.rockford
+    };
   }
 
   resize() {
