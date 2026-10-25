@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_1';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_1';
+import { BoulderDashEngine } from './engine.js?v=20261025_2';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_2';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -12,7 +12,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   const canvas = document.getElementById('game-canvas');
   const soundToggleBtn = document.getElementById('btn-sound');
   const newWorldBtn = document.getElementById('btn-new-world');
+  const btnHelp = document.getElementById('btn-help');
   const messageBanner = document.getElementById('message-banner');
+
+  // Help modal elements
+  const helpModal = document.getElementById('help-modal');
+  const btnCloseHelp = document.getElementById('btn-close-help');
 
   // Death modal elements
   const deathModal = document.getElementById('death-modal');
@@ -227,6 +232,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       deathCard.classList.remove('evading');
     }
     deathModal.classList.remove('visible');
+    if (helpModal) {
+      helpModal.classList.remove('visible');
+    }
     // Roguelike: always rolls a completely new random world seed!
     engine.reset();
     if (renderer) {
@@ -261,6 +269,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   const keysDown = new Set();
 
   function updateInput() {
+    if (helpModal && helpModal.classList.contains('visible')) {
+      engine.moving.dir = null;
+      engine.moving.grab = false;
+      return;
+    }
+
     let dir = null;
     if (keysDown.has('ArrowUp') || keysDown.has('KeyW')) {
       dir = DIR.UP;
@@ -284,6 +298,14 @@ window.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
     }
 
+    // If help modal is visible, close on Esc, H, Space, Enter
+    if (helpModal && helpModal.classList.contains('visible')) {
+      if (['Escape', 'KeyH', 'Space', 'Enter'].includes(e.code) || e.key === 'h' || e.key === 'H' || e.key === 'Escape') {
+        closeHelp();
+        return;
+      }
+    }
+
     // If death modal is visible, Space, Enter, or R starts a new run
     if (deathModal.classList.contains('visible')) {
       if (['Space', 'Enter', 'KeyR'].includes(e.code)) {
@@ -302,6 +324,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       startNewRun();
     } else if (e.code === 'KeyM' || e.key === 'm' || e.key === 'M') {
       toggleSound();
+    } else if (e.code === 'KeyH' || e.key === 'h' || e.key === 'H') {
+      toggleHelp();
+    } else if (e.code === 'Escape' || e.key === 'Escape') {
+      if (helpModal && helpModal.classList.contains('visible')) {
+        closeHelp();
+      }
     }
 
     updateInput();
@@ -322,6 +350,42 @@ window.addEventListener('DOMContentLoaded', async () => {
   newWorldBtn.addEventListener('click', () => {
     startNewRun();
   });
+
+  function openHelp() {
+    if (helpModal) {
+      helpModal.classList.add('visible');
+      updateInput();
+    }
+  }
+
+  function closeHelp() {
+    if (helpModal) {
+      helpModal.classList.remove('visible');
+      updateInput();
+    }
+  }
+
+  function toggleHelp() {
+    if (helpModal && helpModal.classList.contains('visible')) {
+      closeHelp();
+    } else {
+      openHelp();
+    }
+  }
+
+  if (btnHelp) {
+    btnHelp.addEventListener('click', toggleHelp);
+  }
+  if (btnCloseHelp) {
+    btnCloseHelp.addEventListener('click', closeHelp);
+  }
+  if (helpModal) {
+    helpModal.addEventListener('click', (e) => {
+      if (e.target === helpModal) {
+        closeHelp();
+      }
+    });
+  }
 
   // Mobile / Touch D-Pad buttons
   const dpadButtons = document.querySelectorAll('[data-dir]');
