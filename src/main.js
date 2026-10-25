@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_7';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_7';
+import { BoulderDashEngine } from './engine.js?v=20261025_8';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_8';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -231,7 +231,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       switch (event) {
         case 'level_loaded':
           sound.playCrack();
-          showMessage('NEW EXPEDITION', 2000);
           if (renderer && renderer.spritesLoaded) {
             renderer.recolorWithPalette(data.seed);
           }
