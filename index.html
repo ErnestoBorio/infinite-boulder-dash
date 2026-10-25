@@ -45,6 +45,7 @@
   <!-- Roguelike Game Over Modal -->
   <div id="death-modal" class="modal-overlay">
     <div class="death-card">
+      <button id="btn-close-death" class="btn-card-close" title="Close & Restart (Esc)" aria-label="Close">✕</button>
       <div class="death-title">CRUSHED!</div>
       <div class="death-subtitle">Rockford perished in the deep infinite caverns</div>
 
@@ -72,7 +73,7 @@
         <div>Best Depth: <strong id="best-depth" style="color:var(--retro-skyblue)">0m</strong></div>
       </div>
 
-      <button id="btn-modal-retry" class="btn-new-run">NEW EXPEDITION</button>
+      <button id="btn-modal-retry" class="btn-new-run" title="New Expedition (Enter, Space, R, or Esc)">NEW EXPEDITION</button>
       <div class="seed-note">Each death generates a completely new procedural world!</div>
     </div>
   </div>
@@ -80,6 +81,7 @@
   <!-- Help & Shortcuts Modal -->
   <div id="help-modal" class="modal-overlay">
     <div class="help-card">
+      <button id="btn-close-help-corner" class="btn-card-close" title="Close (Esc)" aria-label="Close">✕</button>
       <div class="help-title">HOW TO PLAY</div>
       <div class="help-subtitle">Controls & Keyboard Shortcuts</div>
 
@@ -94,15 +96,19 @@
         </div>
         <div class="shortcut-row">
           <span class="shortcut-action">NEW RUN / RESTART</span>
-          <span class="shortcut-keys"><span class="key-tag">R</span></span>
+          <span class="shortcut-keys"><span class="key-tag">R</span> / <span class="key-tag">Enter</span></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-action">CLOSE WINDOW</span>
+          <span class="shortcut-keys"><span class="key-tag">Esc</span></span>
         </div>
         <div class="shortcut-row">
           <span class="shortcut-action">MUTE SOUND</span>
           <span class="shortcut-keys"><span class="key-tag">M</span></span>
         </div>
         <div class="shortcut-row">
-          <span class="shortcut-action">TOGGLE HELP</span>
-          <span class="shortcut-keys"><span class="key-tag">H</span> / <span class="key-tag">Esc</span></span>
+          <span class="shortcut-action">HELP</span>
+          <span class="shortcut-keys"><span class="key-tag">H</span></span>
         </div>
         <div class="shortcut-row">
           <span class="shortcut-action">TOUCH CONTROLS</span>
@@ -141,6 +147,6 @@
     </div>
   </footer>
 
-  <script type="module" src="src/main.js?v=20261025_2"></script>
+  <script type="module" src="src/main.js?v=20261025_3"></script>
 </body>
 </html>

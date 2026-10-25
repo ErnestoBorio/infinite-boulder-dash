@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_2';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_2';
+import { BoulderDashEngine } from './engine.js?v=20261025_3';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_3';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -18,9 +18,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Help modal elements
   const helpModal = document.getElementById('help-modal');
   const btnCloseHelp = document.getElementById('btn-close-help');
+  const btnCloseHelpCorner = document.getElementById('btn-close-help-corner');
 
   // Death modal elements
   const deathModal = document.getElementById('death-modal');
+  const btnCloseDeath = document.getElementById('btn-close-death');
   const deathDiamondsEl = document.getElementById('death-diamonds');
   const deathScoreEl = document.getElementById('death-score');
   const deathDepthEl = document.getElementById('death-depth');
@@ -298,17 +300,22 @@ window.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
     }
 
+    const isEscape = e.code === 'Escape' || e.key === 'Escape' || e.key === 'Esc';
+    const isRestartOrConfirm = [
+      'Space', 'Enter', 'NumpadEnter', 'KeyR'
+    ].includes(e.code) || ['Enter', 'r', 'R', ' '].includes(e.key);
+
     // If help modal is visible, close on Esc, H, Space, Enter
     if (helpModal && helpModal.classList.contains('visible')) {
-      if (['Escape', 'KeyH', 'Space', 'Enter'].includes(e.code) || e.key === 'h' || e.key === 'H' || e.key === 'Escape') {
+      if (isEscape || ['KeyH', 'Space', 'Enter', 'NumpadEnter'].includes(e.code) || ['h', 'H', 'Enter', ' '].includes(e.key)) {
         closeHelp();
         return;
       }
     }
 
-    // If death modal is visible, Space, Enter, or R starts a new run
-    if (deathModal.classList.contains('visible')) {
-      if (['Space', 'Enter', 'KeyR'].includes(e.code)) {
+    // If death modal is visible, Space, Enter, R, or Esc closes the death sign and starts a new run
+    if (deathModal && deathModal.classList.contains('visible')) {
+      if (isEscape || isRestartOrConfirm) {
         startNewRun();
         return;
       }
@@ -316,6 +323,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (deathCard) {
         deathCard.classList.add('evading');
       }
+    }
+
+    // If Rockford died (even before modal delay finishes), Esc, Enter, R, or Space immediately starts new run
+    if (engine.lost && (isEscape || isRestartOrConfirm)) {
+      startNewRun();
+      return;
     }
 
     keysDown.add(e.code);
@@ -326,9 +339,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       toggleSound();
     } else if (e.code === 'KeyH' || e.key === 'h' || e.key === 'H') {
       toggleHelp();
-    } else if (e.code === 'Escape' || e.key === 'Escape') {
+    } else if (isEscape) {
       if (helpModal && helpModal.classList.contains('visible')) {
         closeHelp();
+      } else if (deathModal && deathModal.classList.contains('visible')) {
+        startNewRun();
       }
     }
 
@@ -379,10 +394,24 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (btnCloseHelp) {
     btnCloseHelp.addEventListener('click', closeHelp);
   }
+  if (btnCloseHelpCorner) {
+    btnCloseHelpCorner.addEventListener('click', closeHelp);
+  }
   if (helpModal) {
     helpModal.addEventListener('click', (e) => {
       if (e.target === helpModal) {
         closeHelp();
+      }
+    });
+  }
+
+  if (btnCloseDeath) {
+    btnCloseDeath.addEventListener('click', startNewRun);
+  }
+  if (deathModal) {
+    deathModal.addEventListener('click', (e) => {
+      if (e.target === deathModal) {
+        startNewRun();
       }
     });
   }

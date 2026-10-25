@@ -211,6 +211,7 @@ a.btn {
 }
 
 .death-card {
+  position: relative;
   background: #141124;
   border: 3px solid var(--retro-lightred);
   border-radius: 12px;
@@ -221,6 +222,39 @@ a.btn {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 128, 128, 0.3);
   animation: cardPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-card-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--retro-lightgray);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  line-height: 1;
+  padding: 0;
+  z-index: 10;
+}
+
+.btn-card-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  border-color: #fff;
+  transform: scale(1.08);
+}
+
+.btn-card-close:active {
+  transform: scale(0.95);
 }
 
 .death-card:hover,
@@ -322,6 +356,7 @@ a.btn {
 
 /* Help & Shortcuts Modal: Designed consistently with death modal */
 .help-card {
+  position: relative;
   background: #141124;
   border: 3px solid var(--retro-cyan);
   border-radius: 12px;
