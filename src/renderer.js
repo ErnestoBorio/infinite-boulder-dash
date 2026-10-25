@@ -610,38 +610,28 @@ export class BoulderDashRenderer {
     ctx.font = '700 15px "Press Start 2P", monospace';
     ctx.fillStyle = RETRO_PALETTE[6].hex; // Yellow
     const nextTarget = this.engine.nextMilestone ? this.engine.nextMilestone.count : '∞';
-    ctx.fillText(`${this.engine.diamondsCollected}/${nextTarget}`, 52, 28);
+    const diamText = `${this.engine.diamondsCollected}/${nextTarget}`;
+    ctx.fillText(diamText, 52, 28);
+    const diamWidth = ctx.measureText(diamText).width;
 
-    // 2. Exploration Depth
-    let leftOffset = 150;
-    if (cw >= 850) {
-      ctx.font = '600 13px "Outfit", sans-serif';
-      ctx.fillStyle = RETRO_PALETTE[12].hex; // Sky Blue
-      ctx.fillText(`DEPTH: ${this.engine.maxDepth}m`, leftOffset, 27);
-      leftOffset += 105;
-    }
-
-    // 3. Seed / Roguelike World
-    if (cw >= 1050) {
-      ctx.font = '600 13px "Outfit", sans-serif';
-      ctx.fillStyle = RETRO_PALETTE[14].hex; // Light Gray
-      ctx.fillText(`SEED: #${this.engine.seed}`, leftOffset, 27);
-    }
-
-    // 4. Center Title Spacing (Rendered interactively via #hud-title-link in the DOM)
-    const targetW = Math.min(276, Math.max(120, cw - 460));
-    const titleRight = Math.round((cw + targetW) / 2);
-
-    // 5. Score on the right, safely to the left of the top-toolbar (which is docked at right: 16px)
-    ctx.font = '700 15px "Press Start 2P", monospace';
+    // 2. Score (positioned safely on left next to diamonds, unoccluded by top-right toolbar buttons)
+    ctx.font = '700 14px "Press Start 2P", monospace';
     ctx.fillStyle = RETRO_PALETTE[7].hex; // White
     const scoreStr = String(this.engine.score).padStart(6, '0');
-    const scoreText = `SCORE ${scoreStr}`;
+    const scoreText = (cw < 560) ? scoreStr : `SCORE ${scoreStr}`;
+    const scoreX = Math.round(52 + diamWidth + (cw < 560 ? 14 : 24));
+    ctx.fillText(scoreText, scoreX, 28);
     const scoreWidth = ctx.measureText(scoreText).width;
-    const toolbarMargin = (cw >= 800) ? 315 : 250; // Reserved width for top toolbar buttons
-    const scoreX = Math.max(cw - toolbarMargin - scoreWidth - 16, titleRight + 16);
-    if (cw >= 600 && scoreX + scoreWidth <= cw - toolbarMargin + 25) {
-      ctx.fillText(scoreText, scoreX, 28);
+
+    // 3. Exploration Depth (displayed when space permits before center title)
+    const targetW = Math.min(276, Math.max(120, cw - 460));
+    const titleLeft = Math.round((cw - targetW) / 2);
+    const depthX = scoreX + scoreWidth + 22;
+
+    if (cw >= 820 && depthX + 85 < titleLeft) {
+      ctx.font = '600 13px "Outfit", sans-serif';
+      ctx.fillStyle = RETRO_PALETTE[12].hex; // Sky Blue
+      ctx.fillText(`DEPTH: ${this.engine.maxDepth}m`, depthX, 27);
     }
   }
 

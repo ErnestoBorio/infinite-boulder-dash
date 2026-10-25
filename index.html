@@ -32,7 +32,7 @@
   <!-- Floating Top Controls Toolbar -->
   <div class="top-toolbar">
     <button id="btn-sound" class="btn" title="Toggle Sound (M)">SOUND: ON</button>
-    <button id="btn-new-world" class="btn" title="Generate New World Seed">NEW WORLD</button>
+    <button id="btn-new-world" class="btn" title="Generate New World">NEW WORLD</button>
     <button id="btn-help" class="btn" title="Help & Shortcuts (H)">HELP</button>
     <a id="btn-github" class="btn btn-github" href="https://github.com/ErnestoBorio/infinite-boulder-dash" target="_blank" rel="noopener noreferrer" title="View Source on GitHub" aria-label="GitHub Repository">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -45,7 +45,6 @@
   <!-- Roguelike Game Over Modal -->
   <div id="death-modal" class="modal-overlay">
     <div class="death-card">
-      <button id="btn-close-death" class="btn-card-close" title="Close & Restart (Esc)" aria-label="Close">✕</button>
       <div class="death-title">CRUSHED!</div>
       <div class="death-subtitle">Rockford perished in the deep infinite caverns</div>
 
@@ -73,15 +72,14 @@
         <div>Best Depth: <strong id="best-depth" style="color:var(--retro-skyblue)">0m</strong></div>
       </div>
 
-      <button id="btn-modal-retry" class="btn-new-run" title="New Expedition (Enter, Space, R, or Esc)">NEW EXPEDITION</button>
-      <div class="seed-note">Each death generates a completely new procedural world!</div>
+      <button id="btn-modal-retry" class="btn-new-run" title="New Expedition (Space, R, or Esc)">NEW EXPEDITION</button>
+      <div class="world-note">Each death generates a completely new procedural world!</div>
     </div>
   </div>
 
   <!-- Help & Shortcuts Modal -->
   <div id="help-modal" class="modal-overlay">
     <div class="help-card">
-      <button id="btn-close-help-corner" class="btn-card-close" title="Close (Esc)" aria-label="Close">✕</button>
       <div class="help-title">HOW TO PLAY</div>
       <div class="help-subtitle">Controls & Keyboard Shortcuts</div>
 
@@ -96,7 +94,7 @@
         </div>
         <div class="shortcut-row">
           <span class="shortcut-action">NEW RUN / RESTART</span>
-          <span class="shortcut-keys"><span class="key-tag">R</span> / <span class="key-tag">Enter</span></span>
+          <span class="shortcut-keys"><span class="key-tag">R</span></span>
         </div>
         <div class="shortcut-row">
           <span class="shortcut-action">SCREENSHOT</span>
@@ -152,6 +150,6 @@
   </footer>
 
   <script src="src/html2canvas.min.js"></script>
-  <script type="module" src="src/main.js?v=20261025_4"></script>
+  <script type="module" src="src/main.js?v=20261025_5"></script>
 </body>
 </html>

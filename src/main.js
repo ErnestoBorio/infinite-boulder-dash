@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_4';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_4';
+import { BoulderDashEngine } from './engine.js?v=20261025_5';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_5';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -18,11 +18,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Help modal elements
   const helpModal = document.getElementById('help-modal');
   const btnCloseHelp = document.getElementById('btn-close-help');
-  const btnCloseHelpCorner = document.getElementById('btn-close-help-corner');
 
   // Death modal elements
   const deathModal = document.getElementById('death-modal');
-  const btnCloseDeath = document.getElementById('btn-close-death');
   const deathDiamondsEl = document.getElementById('death-diamonds');
   const deathScoreEl = document.getElementById('death-score');
   const deathDepthEl = document.getElementById('death-depth');
@@ -145,7 +143,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       switch (event) {
         case 'level_loaded':
           sound.playCrack();
-          showMessage(`NEW EXPEDITION - SEED #${data.seed}`, 2000);
+          showMessage('NEW EXPEDITION', 2000);
           if (renderer && renderer.spritesLoaded) {
             renderer.recolorWithPalette(data.seed);
           }
@@ -300,8 +298,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const d = new Date();
     const pad = (n) => String(n).padStart(2, '0');
     const dateStr = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-    const seedStr = engine ? `seed${engine.seed}-` : '';
-    return `boulderdash-${seedStr}${dateStr}.png`;
+    return `boulderdash-${dateStr}.png`;
   }
 
   function downloadCanvas(outCanvas) {
@@ -354,6 +351,19 @@ window.addEventListener('DOMContentLoaded', async () => {
                 ctx.drawImage(realCanvas, 0, 0);
               }
             }
+
+            // Fix shadow rendering bug in html2canvas for modal cards:
+            // html2canvas fails on border-radius + box-shadow, generating dark blocky rectangles.
+            // Resetting card box-shadow and disabling animation ensures clean, crisp modal rendering.
+            clonedDoc.querySelectorAll('.death-card, .help-card').forEach((card) => {
+              card.style.boxShadow = 'none';
+              card.style.webkitBoxShadow = 'none';
+              card.style.animation = 'none';
+            });
+            clonedDoc.querySelectorAll('.modal-overlay').forEach((overlay) => {
+              overlay.style.backdropFilter = 'none';
+              overlay.style.webkitBackdropFilter = 'none';
+            });
           }
         });
       } else {
@@ -484,9 +494,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (btnCloseHelp) {
     btnCloseHelp.addEventListener('click', closeHelp);
   }
-  if (btnCloseHelpCorner) {
-    btnCloseHelpCorner.addEventListener('click', closeHelp);
-  }
   if (helpModal) {
     helpModal.addEventListener('click', (e) => {
       if (e.target === helpModal) {
@@ -495,9 +502,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  if (btnCloseDeath) {
-    btnCloseDeath.addEventListener('click', startNewRun);
-  }
   if (deathModal) {
     deathModal.addEventListener('click', (e) => {
       if (e.target === deathModal) {
