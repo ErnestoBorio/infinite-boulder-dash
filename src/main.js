@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_3';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_3';
+import { BoulderDashEngine } from './engine.js?v=20261025_4';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_4';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -293,11 +293,101 @@ window.addEventListener('DOMContentLoaded', async () => {
     engine.moving.grab = grab;
   }
 
+  // Screenshot capture (Hotkey: P)
+  let isCapturingScreenshot = false;
+
+  function getScreenshotFilename() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const dateStr = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+    const seedStr = engine ? `seed${engine.seed}-` : '';
+    return `boulderdash-${seedStr}${dateStr}.png`;
+  }
+
+  function downloadCanvas(outCanvas) {
+    const filename = getScreenshotFilename();
+    if (outCanvas.toBlob) {
+      outCanvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+          link.remove();
+          URL.revokeObjectURL(url);
+        }, 1500);
+      }, 'image/png');
+    } else {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = outCanvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => link.remove(), 1500);
+    }
+  }
+
+  async function captureScreen() {
+    if (isCapturingScreenshot) return;
+    isCapturingScreenshot = true;
+
+    try {
+      let outputCanvas = null;
+
+      if (typeof window.html2canvas === 'function') {
+        outputCanvas = await window.html2canvas(document.body, {
+          backgroundColor: '#0a0a0f',
+          scale: window.devicePixelRatio || 1,
+          logging: false,
+          useCORS: true,
+          onclone: (clonedDoc) => {
+            const realCanvas = document.getElementById('game-canvas');
+            const clonedCanvas = clonedDoc.getElementById('game-canvas');
+            if (realCanvas && clonedCanvas) {
+              clonedCanvas.width = realCanvas.width;
+              clonedCanvas.height = realCanvas.height;
+              const ctx = clonedCanvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(realCanvas, 0, 0);
+              }
+            }
+          }
+        });
+      } else {
+        outputCanvas = canvas;
+      }
+
+      if (outputCanvas) {
+        downloadCanvas(outputCanvas);
+        showMessage('📸 SCREENSHOT SAVED!', 2000);
+      }
+    } catch (err) {
+      console.warn('html2canvas capture error, falling back to canvas:', err);
+      try {
+        downloadCanvas(canvas);
+        showMessage('📸 SCREENSHOT SAVED!', 2000);
+      } catch (fallbackErr) {
+        console.error('Canvas capture failed:', fallbackErr);
+      }
+    } finally {
+      isCapturingScreenshot = false;
+    }
+  }
+
   window.addEventListener('keydown', (e) => {
     sound.ensureContext();
 
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
       e.preventDefault();
+    }
+
+    const isScreenshot = e.code === 'KeyP' || e.key === 'p' || e.key === 'P';
+    if (isScreenshot) {
+      captureScreen();
+      return;
     }
 
     const isEscape = e.code === 'Escape' || e.key === 'Escape' || e.key === 'Esc';
