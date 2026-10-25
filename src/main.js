@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_8';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_8';
+import { BoulderDashEngine } from './engine.js?v=20261025_9';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_9';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -50,36 +50,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }, duration);
   }
 
-  let currentBannerPlacement = 'below';
-  const BANNER_VERTICAL_OFFSET = 88;
-  const BANNER_HORIZONTAL_OFFSET = 80;
-
-  function applyBannerPlacement(pos, cw, ch, bannerW, bannerH) {
-    const halfW = bannerW / 2;
-    let targetX = pos.x;
-    let targetY;
-
-    if (currentBannerPlacement === 'above') {
-      targetY = pos.y - BANNER_VERTICAL_OFFSET - bannerH;
-      targetX = Math.max(halfW + 16, Math.min(cw - halfW - 16, pos.x));
-    } else if (currentBannerPlacement === 'below') {
-      targetY = pos.y + BANNER_VERTICAL_OFFSET;
-      targetX = Math.max(halfW + 16, Math.min(cw - halfW - 16, pos.x));
-    } else if (currentBannerPlacement === 'left') {
-      targetX = Math.max(halfW + 16, pos.x - halfW - BANNER_HORIZONTAL_OFFSET);
-      targetY = Math.max(64, Math.min(ch - bannerH - 24, pos.y - bannerH / 2));
-    } else if (currentBannerPlacement === 'right') {
-      targetX = Math.min(cw - halfW - 16, pos.x + halfW + BANNER_HORIZONTAL_OFFSET);
-      targetY = Math.max(64, Math.min(ch - bannerH - 24, pos.y - bannerH / 2));
-    }
-
-    targetY = Math.max(64, Math.min(ch - bannerH - 24, targetY));
-
-    messageBanner.style.left = `${Math.round(targetX)}px`;
-    messageBanner.style.top = `${Math.round(targetY)}px`;
-  }
-
-  function updateMessageBannerPosition(preferredSide = null) {
+  function updateMessageBannerPosition() {
     if (!renderer) return;
 
     const pos = renderer.getRockfordScreenPos();
@@ -88,62 +59,34 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const bannerW = messageBanner.offsetWidth || 320;
     const bannerH = messageBanner.offsetHeight || 44;
+    const halfW = bannerW / 2;
 
-    if (preferredSide) {
-      currentBannerPlacement = preferredSide;
+    // Space a couple of blocks (2 blocks = 64px) away from Rockford's edge (16px)
+    const ts = renderer.tileSize || 32;
+    const blockSpacing = Math.round(16 + 2 * ts); // 80px: exactly 2 blocks of clearance
+
+    let targetX = pos.x;
+    let targetY;
+
+    // Show 2 blocks below if in top half, or 2 blocks above if in bottom half
+    if (pos.y < ch / 2) {
+      targetY = pos.y + blockSpacing;
+      if (targetY + bannerH > ch - 24) {
+        targetY = pos.y - blockSpacing - bannerH;
+      }
     } else {
-      // Pick best side away from Rockford with generous spacing
-      currentBannerPlacement = (pos.y < ch / 2) ? 'below' : 'above';
-      if (currentBannerPlacement === 'above' && pos.y - BANNER_VERTICAL_OFFSET - bannerH < 64) {
-        currentBannerPlacement = 'below';
-      } else if (currentBannerPlacement === 'below' && pos.y + BANNER_VERTICAL_OFFSET + bannerH > ch - 24) {
-        currentBannerPlacement = 'above';
+      targetY = pos.y - blockSpacing - bannerH;
+      if (targetY < 64) {
+        targetY = pos.y + blockSpacing;
       }
     }
 
-    applyBannerPlacement(pos, cw, ch, bannerW, bannerH);
-  }
+    // Keep safely within screen bounds
+    targetX = Math.max(halfW + 16, Math.min(cw - halfW - 16, targetX));
+    targetY = Math.max(64, Math.min(ch - bannerH - 24, targetY));
 
-  function checkMessageBannerEvade() {
-    if (!renderer || !messageBanner.classList.contains('visible')) return;
-    const pos = renderer.getRockfordScreenPos();
-    const bannerRect = messageBanner.getBoundingClientRect();
-    if (bannerRect.width === 0 || bannerRect.height === 0) return;
-
-    const cw = window.innerWidth;
-    const ch = window.innerHeight;
-    const bannerW = bannerRect.width;
-    const bannerH = bannerRect.height;
-
-    // Safety margin around Rockford (32x32 sprite) and the banner
-    const margin = 48;
-    const occludes = (
-      pos.x >= bannerRect.left - margin &&
-      pos.x <= bannerRect.right + margin &&
-      pos.y >= bannerRect.top - margin &&
-      pos.y <= bannerRect.bottom + margin
-    );
-
-    if (occludes) {
-      // Rockford is approaching or occluded by the banner! Move the banner away so Rockford is clear
-      if (currentBannerPlacement === 'below') {
-        if (pos.y - BANNER_VERTICAL_OFFSET - bannerH >= 64) {
-          currentBannerPlacement = 'above';
-        } else {
-          currentBannerPlacement = (pos.x < cw / 2) ? 'right' : 'left';
-        }
-      } else if (currentBannerPlacement === 'above') {
-        if (pos.y + BANNER_VERTICAL_OFFSET + bannerH <= ch - 24) {
-          currentBannerPlacement = 'below';
-        } else {
-          currentBannerPlacement = (pos.x < cw / 2) ? 'right' : 'left';
-        }
-      } else {
-        currentBannerPlacement = (pos.y < ch / 2) ? 'below' : 'above';
-      }
-
-      applyBannerPlacement(pos, cw, ch, bannerW, bannerH);
-    }
+    messageBanner.style.left = `${Math.round(targetX)}px`;
+    messageBanner.style.top = `${Math.round(targetY)}px`;
   }
 
   function updateDeathSignPosition() {
@@ -347,6 +290,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   function resize() {
     renderer.resize();
+    if (messageBanner && messageBanner.classList.contains('visible')) {
+      updateMessageBannerPosition();
+    }
   }
   window.addEventListener('resize', resize);
   resize();
@@ -652,10 +598,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     while (accumulator >= physicsStep) {
       engine.update();
       accumulator -= physicsStep;
-    }
-
-    if (messageBanner.classList.contains('visible')) {
-      checkMessageBannerEvade();
     }
 
     if (deathModal.classList.contains('visible')) {
