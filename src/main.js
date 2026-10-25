@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_5';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_5';
+import { BoulderDashEngine } from './engine.js?v=20261025_6';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_6';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -52,6 +52,31 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   let currentBannerPlacement = 'below';
 
+  function applyBannerPlacement(pos, cw, ch, bannerW, bannerH) {
+    const halfW = bannerW / 2;
+    let targetX = pos.x;
+    let targetY;
+
+    if (currentBannerPlacement === 'above') {
+      targetY = pos.y - 44 - bannerH;
+      targetX = Math.max(halfW + 16, Math.min(cw - halfW - 16, pos.x));
+    } else if (currentBannerPlacement === 'below') {
+      targetY = pos.y + 44;
+      targetX = Math.max(halfW + 16, Math.min(cw - halfW - 16, pos.x));
+    } else if (currentBannerPlacement === 'left') {
+      targetX = Math.max(halfW + 16, pos.x - halfW - 36);
+      targetY = Math.max(54, Math.min(ch - bannerH - 16, pos.y - bannerH / 2));
+    } else if (currentBannerPlacement === 'right') {
+      targetX = Math.min(cw - halfW - 16, pos.x + halfW + 36);
+      targetY = Math.max(54, Math.min(ch - bannerH - 16, pos.y - bannerH / 2));
+    }
+
+    targetY = Math.max(54, Math.min(ch - bannerH - 16, targetY));
+
+    messageBanner.style.left = `${Math.round(targetX)}px`;
+    messageBanner.style.top = `${Math.round(targetY)}px`;
+  }
+
   function updateMessageBannerPosition(preferredSide = null) {
     if (!renderer) return;
 
@@ -61,32 +86,18 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const bannerW = messageBanner.offsetWidth || 320;
     const bannerH = messageBanner.offsetHeight || 44;
-    const halfW = bannerW / 2;
 
-    // Horizontally center at Rockford, clamped within screen margins
-    const targetX = Math.max(halfW + 12, Math.min(cw - halfW - 12, pos.x));
-
-    let side = preferredSide || currentBannerPlacement;
-    let targetY;
-
-    if (side === 'above') {
-      targetY = pos.y - 24 - bannerH;
-      if (targetY < 54) {
-        targetY = pos.y + 36;
-        side = 'below';
-      }
+    if (preferredSide) {
+      currentBannerPlacement = preferredSide;
     } else {
-      targetY = pos.y + 36;
-      if (targetY + bannerH > ch - 16) {
-        targetY = pos.y - 24 - bannerH;
-        side = 'above';
+      // Pick best side away from Rockford
+      currentBannerPlacement = (pos.y < ch / 2) ? 'below' : 'above';
+      if (currentBannerPlacement === 'above' && pos.y - 44 - bannerH < 54) {
+        currentBannerPlacement = 'below';
       }
     }
-    targetY = Math.max(54, Math.min(ch - bannerH - 16, targetY));
-    currentBannerPlacement = side;
 
-    messageBanner.style.left = `${Math.round(targetX)}px`;
-    messageBanner.style.top = `${Math.round(targetY)}px`;
+    applyBannerPlacement(pos, cw, ch, bannerW, bannerH);
   }
 
   function checkMessageBannerEvade() {
@@ -95,38 +106,111 @@ window.addEventListener('DOMContentLoaded', async () => {
     const bannerRect = messageBanner.getBoundingClientRect();
     if (bannerRect.width === 0 || bannerRect.height === 0) return;
 
+    const cw = window.innerWidth;
+    const ch = window.innerHeight;
+    const bannerW = bannerRect.width;
+    const bannerH = bannerRect.height;
+
     // Safety margin around Rockford (32x32 sprite) and the banner
-    const margin = 20;
-    const isBeneath = (
+    const margin = 24;
+    const occludes = (
       pos.x >= bannerRect.left - margin &&
       pos.x <= bannerRect.right + margin &&
       pos.y >= bannerRect.top - margin &&
       pos.y <= bannerRect.bottom + margin
     );
 
-    if (isBeneath) {
-      messageBanner.classList.add('evading');
-      // Flip side so the sign gets out of the way!
-      const newSide = (currentBannerPlacement === 'below') ? 'above' : 'below';
-      updateMessageBannerPosition(newSide);
-    } else {
-      messageBanner.classList.remove('evading');
+    if (occludes) {
+      // Rockford is occluded by the banner! Move the banner away so Rockford is clear
+      if (currentBannerPlacement === 'below') {
+        if (pos.y - 44 - bannerH >= 54) {
+          currentBannerPlacement = 'above';
+        } else {
+          currentBannerPlacement = (pos.x < cw / 2) ? 'right' : 'left';
+        }
+      } else if (currentBannerPlacement === 'above') {
+        if (pos.y + 44 + bannerH <= ch - 16) {
+          currentBannerPlacement = 'below';
+        } else {
+          currentBannerPlacement = (pos.x < cw / 2) ? 'right' : 'left';
+        }
+      } else {
+        currentBannerPlacement = (pos.y < ch / 2) ? 'below' : 'above';
+      }
+
+      applyBannerPlacement(pos, cw, ch, bannerW, bannerH);
     }
   }
 
   function updateDeathSignPosition() {
     if (!renderer) return;
     const pos = renderer.getRockfordScreenPos();
+    const cw = window.innerWidth;
     const ch = window.innerHeight;
     const deathCard = deathModal.querySelector('.death-card');
     if (!deathCard) return;
 
-    // If Rockford / death position is near the center, shift death card upward
-    // so the death spot is clearly visible below it
-    if (pos.y >= ch / 2 - 80) {
-      deathCard.style.transform = 'translateY(-110px)';
+    const cardW = deathCard.offsetWidth || 480;
+    const cardH = deathCard.offsetHeight || 340;
+    const halfW = cardW / 2;
+    const halfH = cardH / 2;
+    const cx = cw / 2;
+    const cy = ch / 2;
+
+    // Check if Rockford's death spot is occluded by the centered death card
+    const margin = 36;
+    const overlapsX = (pos.x >= cx - halfW - margin && pos.x <= cx + halfW + margin);
+    const overlapsY = (pos.y >= cy - halfH - margin && pos.y <= cy + halfH + margin);
+
+    if (overlapsX && overlapsY) {
+      // Occludes Rockford! Move the death card away so Rockford is 100% visible
+      if (pos.y >= cy) {
+        // Rockford is in lower half -> move card up
+        const shiftY = Math.min(-110, -(halfH + 24 - (cy - pos.y)));
+        const maxUp = -(cy - halfH - 54);
+        deathCard.style.transform = `translateY(${Math.max(maxUp, shiftY)}px)`;
+      } else {
+        // Rockford is in upper half -> move card down
+        const shiftY = Math.max(110, halfH + 24 + (pos.y - cy));
+        const maxDown = ch - halfH - 20 - cy;
+        deathCard.style.transform = `translateY(${Math.min(maxDown, shiftY)}px)`;
+      }
     } else {
-      deathCard.style.transform = 'translateY(110px)';
+      deathCard.style.transform = '';
+    }
+  }
+
+  function updateHelpSignPosition() {
+    if (!renderer) return;
+    const pos = renderer.getRockfordScreenPos();
+    const cw = window.innerWidth;
+    const ch = window.innerHeight;
+    const helpCard = helpModal ? helpModal.querySelector('.help-card') : null;
+    if (!helpCard) return;
+
+    const cardW = helpCard.offsetWidth || 500;
+    const cardH = helpCard.offsetHeight || 380;
+    const halfW = cardW / 2;
+    const halfH = cardH / 2;
+    const cx = cw / 2;
+    const cy = ch / 2;
+
+    const margin = 36;
+    const overlapsX = (pos.x >= cx - halfW - margin && pos.x <= cx + halfW + margin);
+    const overlapsY = (pos.y >= cy - halfH - margin && pos.y <= cy + halfH + margin);
+
+    if (overlapsX && overlapsY) {
+      if (pos.y >= cy) {
+        const shiftY = Math.min(-100, -(halfH + 20 - (cy - pos.y)));
+        const maxUp = -(cy - halfH - 54);
+        helpCard.style.transform = `translateY(${Math.max(maxUp, shiftY)}px)`;
+      } else {
+        const shiftY = Math.max(100, halfH + 20 + (pos.y - cy));
+        const maxDown = ch - halfH - 20 - cy;
+        helpCard.style.transform = `translateY(${Math.min(maxDown, shiftY)}px)`;
+      }
+    } else {
+      helpCard.style.transform = '';
     }
   }
 
@@ -229,7 +313,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     const deathCard = deathModal.querySelector('.death-card');
     if (deathCard) {
       deathCard.style.transform = '';
-      deathCard.classList.remove('evading');
     }
     deathModal.classList.remove('visible');
     if (helpModal) {
@@ -419,10 +502,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         startNewRun();
         return;
       }
-      const deathCard = deathModal.querySelector('.death-card');
-      if (deathCard) {
-        deathCard.classList.add('evading');
-      }
     }
 
     // If Rockford died (even before modal delay finishes), Esc, Enter, R, or Space immediately starts new run
@@ -468,6 +547,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   function openHelp() {
     if (helpModal) {
+      updateHelpSignPosition();
       helpModal.classList.add('visible');
       updateInput();
     }
@@ -476,6 +556,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   function closeHelp() {
     if (helpModal) {
       helpModal.classList.remove('visible');
+      const helpCard = helpModal.querySelector('.help-card');
+      if (helpCard) {
+        helpCard.style.transform = '';
+      }
       updateInput();
     }
   }
@@ -569,6 +653,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     if (messageBanner.classList.contains('visible')) {
       checkMessageBannerEvade();
+    }
+
+    if (deathModal.classList.contains('visible')) {
+      updateDeathSignPosition();
     }
 
     renderer.render(delta);
