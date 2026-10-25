@@ -3,15 +3,14 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261024_3';
-import { BoulderDashRenderer } from './renderer.js?v=20261024_3';
+import { BoulderDashEngine } from './engine.js?v=20261024_4';
+import { BoulderDashRenderer } from './renderer.js?v=20261024_4';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const canvas = document.getElementById('game-canvas');
   const soundToggleBtn = document.getElementById('btn-sound');
-  const paletteBtn = document.getElementById('btn-palette');
   const newWorldBtn = document.getElementById('btn-new-world');
   const messageBanner = document.getElementById('message-banner');
 
@@ -239,8 +238,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       startNewRun();
     } else if (e.code === 'KeyM' || e.key === 'm' || e.key === 'M') {
       toggleSound();
-    } else if (e.code === 'KeyP' || e.key === 'p' || e.key === 'P') {
-      triggerCyclePalette();
     }
 
     updateInput();
@@ -254,16 +251,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   function toggleSound() {
     sound.enabled = !sound.enabled;
     soundToggleBtn.textContent = `SOUND: ${sound.enabled ? 'ON' : 'OFF'}`;
-  }
-
-  function triggerCyclePalette() {
-    if (!renderer) return;
-    const info = renderer.cycleRockfordPalette();
-    showMessage(`ROCKFORD: ${info.name}`, 3000);
-  }
-
-  if (paletteBtn) {
-    paletteBtn.addEventListener('click', triggerCyclePalette);
   }
 
   soundToggleBtn.addEventListener('click', toggleSound);
