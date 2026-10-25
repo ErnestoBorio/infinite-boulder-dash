@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_9';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_9';
+import { BoulderDashEngine } from './engine.js?v=20261025_10';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_10';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -87,44 +87,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     messageBanner.style.left = `${Math.round(targetX)}px`;
     messageBanner.style.top = `${Math.round(targetY)}px`;
-  }
-
-  function updateDeathSignPosition() {
-    if (!renderer) return;
-    const pos = renderer.getRockfordScreenPos();
-    const cw = window.innerWidth;
-    const ch = window.innerHeight;
-    const deathCard = deathModal.querySelector('.death-card');
-    if (!deathCard) return;
-
-    const cardW = deathCard.offsetWidth || 480;
-    const cardH = deathCard.offsetHeight || 340;
-    const halfW = cardW / 2;
-    const halfH = cardH / 2;
-    const cx = cw / 2;
-    const cy = ch / 2;
-
-    // Check if Rockford's death spot is occluded by the centered death card
-    const margin = 48;
-    const overlapsX = (pos.x >= cx - halfW - margin && pos.x <= cx + halfW + margin);
-    const overlapsY = (pos.y >= cy - halfH - margin && pos.y <= cy + halfH + margin);
-
-    if (overlapsX && overlapsY) {
-      // Occludes Rockford! Move the death card away so Rockford is 100% visible
-      if (pos.y >= cy) {
-        // Rockford is in lower half -> move card up
-        const shiftY = Math.min(-140, -(halfH + 48 - (cy - pos.y)));
-        const maxUp = -(cy - halfH - 64);
-        deathCard.style.transform = `translateY(${Math.max(maxUp, shiftY)}px)`;
-      } else {
-        // Rockford is in upper half -> move card down
-        const shiftY = Math.max(140, halfH + 48 + (pos.y - cy));
-        const maxDown = ch - halfH - 24 - cy;
-        deathCard.style.transform = `translateY(${Math.min(maxDown, shiftY)}px)`;
-      }
-    } else {
-      deathCard.style.transform = '';
-    }
   }
 
   function updateHelpSignPosition() {
@@ -239,7 +201,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     deathTimeout = setTimeout(() => {
       if (engine.lost) {
-        updateDeathSignPosition();
         deathModal.classList.add('visible');
       }
     }, 1500);
@@ -598,10 +559,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     while (accumulator >= physicsStep) {
       engine.update();
       accumulator -= physicsStep;
-    }
-
-    if (deathModal.classList.contains('visible')) {
-      updateDeathSignPosition();
     }
 
     renderer.render(delta);
