@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261024_4';
-import { BoulderDashRenderer } from './renderer.js?v=20261024_4';
+import { BoulderDashEngine } from './engine.js?v=20261025_1';
+import { BoulderDashRenderer } from './renderer.js?v=20261025_1';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -45,7 +45,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     }, duration);
   }
 
-  function updateMessageBannerPosition() {
+  let currentBannerPlacement = 'below';
+
+  function updateMessageBannerPosition(preferredSide = null) {
     if (!renderer) return;
 
     const pos = renderer.getRockfordScreenPos();
@@ -59,16 +61,68 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Horizontally center at Rockford, clamped within screen margins
     const targetX = Math.max(halfW + 12, Math.min(cw - halfW - 12, pos.x));
 
-    // Position out of the way below Rockford (pos.y + 16 is feet, + 20px clearance = pos.y + 36)
-    let targetY = pos.y + 36;
-    if (targetY + bannerH > ch - 16) {
-      // Flip above Rockford if viewport bottom is cramped
-      targetY = pos.y - 20 - bannerH;
+    let side = preferredSide || currentBannerPlacement;
+    let targetY;
+
+    if (side === 'above') {
+      targetY = pos.y - 24 - bannerH;
+      if (targetY < 54) {
+        targetY = pos.y + 36;
+        side = 'below';
+      }
+    } else {
+      targetY = pos.y + 36;
+      if (targetY + bannerH > ch - 16) {
+        targetY = pos.y - 24 - bannerH;
+        side = 'above';
+      }
     }
-    targetY = Math.max(54, targetY);
+    targetY = Math.max(54, Math.min(ch - bannerH - 16, targetY));
+    currentBannerPlacement = side;
 
     messageBanner.style.left = `${Math.round(targetX)}px`;
     messageBanner.style.top = `${Math.round(targetY)}px`;
+  }
+
+  function checkMessageBannerEvade() {
+    if (!renderer || !messageBanner.classList.contains('visible')) return;
+    const pos = renderer.getRockfordScreenPos();
+    const bannerRect = messageBanner.getBoundingClientRect();
+    if (bannerRect.width === 0 || bannerRect.height === 0) return;
+
+    // Safety margin around Rockford (32x32 sprite) and the banner
+    const margin = 20;
+    const isBeneath = (
+      pos.x >= bannerRect.left - margin &&
+      pos.x <= bannerRect.right + margin &&
+      pos.y >= bannerRect.top - margin &&
+      pos.y <= bannerRect.bottom + margin
+    );
+
+    if (isBeneath) {
+      messageBanner.classList.add('evading');
+      // Flip side so the sign gets out of the way!
+      const newSide = (currentBannerPlacement === 'below') ? 'above' : 'below';
+      updateMessageBannerPosition(newSide);
+    } else {
+      messageBanner.classList.remove('evading');
+    }
+  }
+
+  function updateDeathSignPosition() {
+    if (!renderer) return;
+    const pos = renderer.getRockfordScreenPos();
+    const ch = window.innerHeight;
+    const deathCard = deathModal.querySelector('.death-card');
+    if (!deathCard) return;
+
+    // If Rockford / death position is near the center, shift death card upward
+    // so the death spot is clearly visible below it
+    if (pos.y >= ch / 2 - 80) {
+      deathCard.style.transform = 'translateY(-110px)';
+    } else {
+      deathCard.style.transform = 'translateY(110px)';
+    }
   }
 
   let renderer = null;
@@ -150,6 +204,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     deathTimeout = setTimeout(() => {
       if (engine.lost) {
+        updateDeathSignPosition();
         deathModal.classList.add('visible');
       }
     }, 1500);
@@ -165,6 +220,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (deathTimeout) {
       clearTimeout(deathTimeout);
       deathTimeout = null;
+    }
+    const deathCard = deathModal.querySelector('.death-card');
+    if (deathCard) {
+      deathCard.style.transform = '';
+      deathCard.classList.remove('evading');
     }
     deathModal.classList.remove('visible');
     // Roguelike: always rolls a completely new random world seed!
@@ -229,6 +289,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (['Space', 'Enter', 'KeyR'].includes(e.code)) {
         startNewRun();
         return;
+      }
+      const deathCard = deathModal.querySelector('.death-card');
+      if (deathCard) {
+        deathCard.classList.add('evading');
       }
     }
 
@@ -314,6 +378,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     while (accumulator >= physicsStep) {
       engine.update();
       accumulator -= physicsStep;
+    }
+
+    if (messageBanner.classList.contains('visible')) {
+      checkMessageBannerEvade();
     }
 
     renderer.render(delta);

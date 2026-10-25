@@ -154,7 +154,7 @@ a.btn {
   border-radius: 8px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.25s ease, left 0.25s ease;
   text-shadow: 2px 2px 0px #000;
   z-index: 100;
   text-align: center;
@@ -167,6 +167,10 @@ a.btn {
 #message-banner.visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0) scale(1);
+}
+
+#message-banner.evading {
+  opacity: 0.3;
 }
 
 .milestone-title {
@@ -216,6 +220,12 @@ a.btn {
   text-align: center;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 128, 128, 0.3);
   animation: cardPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.death-card:hover,
+.death-card.evading {
+  opacity: 0.18;
 }
 
 @keyframes cardPop {
