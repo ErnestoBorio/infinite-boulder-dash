@@ -330,7 +330,7 @@ export class BoulderDashEngine {
         this.onEvent('dig');
       } else if (targetObj === OBJECT.DIAMOND || targetObj === OBJECT.DIAMONDFALLING) {
         this.set(targetPos.x, targetPos.y, OBJECT.SPACE);
-        this.collectDiamond();
+        this.collectDiamond(targetPos.x, targetPos.y);
       } else if ((dir === DIR.LEFT || dir === DIR.RIGHT) && targetObj === OBJECT.BOULDER) {
         this.pushBoulder(x, y, targetPos.x, targetPos.y, dir, false);
       }
@@ -347,7 +347,7 @@ export class BoulderDashEngine {
     } else if (targetObj === OBJECT.DIAMOND) {
       this.move(x, y, targetPos.x, targetPos.y, OBJECT.ROCKFORD);
       this.rockford = { x: targetPos.x, y: targetPos.y };
-      this.collectDiamond();
+      this.collectDiamond(targetPos.x, targetPos.y);
     } else if ((dir === DIR.LEFT || dir === DIR.RIGHT) && targetObj === OBJECT.BOULDER) {
       this.pushBoulder(x, y, targetPos.x, targetPos.y, dir, true);
     }
@@ -619,13 +619,18 @@ export class BoulderDashEngine {
     }
   }
 
-  collectDiamond() {
+  collectDiamond(x = null, y = null) {
     this.diamondsCollected++;
     this.score += this.diamondValue;
 
+    const cellX = (x !== null) ? x : (this.rockford ? this.rockford.x : 0);
+    const cellY = (y !== null) ? y : (this.rockford ? this.rockford.y : 0);
+
     this.onEvent('diamond_collected', {
       collected: this.diamondsCollected,
-      score: this.score
+      score: this.score,
+      x: cellX,
+      y: cellY
     });
 
     // Check if player reached the next milestone
@@ -638,7 +643,9 @@ export class BoulderDashEngine {
         count: milestone.count,
         title: milestone.title,
         bonus: milestone.bonus,
-        totalDiamonds: this.diamondsCollected
+        totalDiamonds: this.diamondsCollected,
+        x: cellX,
+        y: cellY
       });
 
       this.nextMilestone = getNextMilestone(this.diamondsCollected);

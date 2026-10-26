@@ -138,12 +138,12 @@ a.btn {
   }
 }
 
-/* Floating Milestone Message Sign: Solid, opaque, spaced away from Rockford */
+/* Floating System Notification Toast: Centered at top under HUD, solid */
 #message-banner {
   position: fixed;
-  top: 0;
-  left: 0;
-  transform: translateX(-50%) translateY(6px) scale(0.95);
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0) scale(0.95);
   background: #0f0d1b;
   border: 2px solid var(--retro-yellow);
   color: var(--retro-yellow);

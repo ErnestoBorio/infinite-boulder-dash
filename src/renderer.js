@@ -195,6 +195,9 @@ export class BoulderDashRenderer {
     // Center HUD Title Image
     this.titleImage = null;
     this.titleImageLoaded = false;
+
+    // World-anchored floating arcade text notifications (e.g. milestones)
+    this.floatingTexts = [];
   }
 
   async loadSprites(src = 'images/sprites.png') {
@@ -459,6 +462,16 @@ export class BoulderDashRenderer {
     };
   }
 
+  addFloatingText(x, y, lines, duration = 2.5) {
+    this.floatingTexts.push({
+      x: x + 0.5,
+      y: y + 0.2,
+      lines: Array.isArray(lines) ? lines : [lines],
+      elapsed: 0,
+      duration: duration
+    });
+  }
+
   render(deltaTime = 0) {
     if (!this.spritesLoaded) return;
 
@@ -538,8 +551,75 @@ export class BoulderDashRenderer {
       }
     }
 
+    // Render world-anchored floating arcade notifications (scroll with cave)
+    if (this.floatingTexts.length > 0) {
+      this.renderFloatingTexts(ctx, deltaTime);
+    }
+
     // Draw Top HUD Bar
     this.renderHUD(ctx, cw, ch);
+  }
+
+  renderFloatingTexts(ctx, deltaTime) {
+    const ts = this.tileSize;
+    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+      const item = this.floatingTexts[i];
+      item.elapsed += deltaTime;
+      if (item.elapsed >= item.duration) {
+        this.floatingTexts.splice(i, 1);
+        continue;
+      }
+
+      const progress = item.elapsed / item.duration; // 0 to 1
+      // Smooth upward drift: 64px rise
+      const ease = 1 - Math.pow(1 - progress, 2);
+      const floatY = ease * 64;
+
+      // Screen position in viewport
+      const sx = Math.round(item.x * ts - this.camera.x);
+      const sy = Math.round(item.y * ts - this.camera.y - floatY);
+
+      // Alpha: hold opaque for first 60%, then fade out
+      let alpha = 1.0;
+      if (progress > 0.6) {
+        alpha = Math.max(0, 1 - (progress - 0.6) / 0.4);
+      }
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Subtle pop-in scale
+      const scale = progress < 0.12 ? 0.8 + (progress / 0.12) * 0.2 : 1.0;
+      ctx.translate(sx, sy);
+      if (scale !== 1.0) {
+        ctx.scale(scale, scale);
+      }
+
+      let lineOffset = -(item.lines.length - 1) * 9;
+      for (const line of item.lines) {
+        const text = typeof line === 'string' ? line : line.text;
+        const color = (typeof line === 'object' && line.color) ? line.color : '#FFFF00';
+        const size = (typeof line === 'object' && line.size) ? line.size : 12;
+
+        ctx.font = `bold ${size}px "Press Start 2P", monospace`;
+
+        // Crisp dark outline for contrast over any cave element
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#000000';
+        ctx.strokeText(text, 0, lineOffset);
+
+        // Retro arcade fill
+        ctx.fillStyle = color;
+        ctx.fillText(text, 0, lineOffset);
+
+        lineOffset += size + 7;
+      }
+
+      ctx.restore();
+    }
   }
 
   renderCell(ctx, cell, sx, sy, sw, sh) {

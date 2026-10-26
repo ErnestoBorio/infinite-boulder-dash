@@ -3,8 +3,8 @@
  * Manages roguelike permadeath, new world generation, milestones, and input.
  */
 
-import { BoulderDashEngine } from './engine.js?v=20261025_10';
-import { BoulderDashRenderer } from './renderer.js?v=20261025_10';
+import { BoulderDashEngine } from './engine.js?v=20261026_1';
+import { BoulderDashRenderer } from './renderer.js?v=20261026_1';
 import { sound } from './audio.js';
 import { DIR } from './caves.js';
 
@@ -51,42 +51,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   function updateMessageBannerPosition() {
-    if (!renderer) return;
-
-    const pos = renderer.getRockfordScreenPos();
     const cw = window.innerWidth;
-    const ch = window.innerHeight;
-
-    const bannerW = messageBanner.offsetWidth || 320;
-    const bannerH = messageBanner.offsetHeight || 44;
-    const halfW = bannerW / 2;
-
-    // Space a couple of blocks (2 blocks = 64px) away from Rockford's edge (16px)
-    const ts = renderer.tileSize || 32;
-    const blockSpacing = Math.round(16 + 2 * ts); // 80px: exactly 2 blocks of clearance
-
-    let targetX = pos.x;
-    let targetY;
-
-    // Show 2 blocks below if in top half, or 2 blocks above if in bottom half
-    if (pos.y < ch / 2) {
-      targetY = pos.y + blockSpacing;
-      if (targetY + bannerH > ch - 24) {
-        targetY = pos.y - blockSpacing - bannerH;
-      }
-    } else {
-      targetY = pos.y - blockSpacing - bannerH;
-      if (targetY < 64) {
-        targetY = pos.y + blockSpacing;
-      }
-    }
-
-    // Keep safely within screen bounds
-    targetX = Math.max(halfW + 16, Math.min(cw - halfW - 16, targetX));
-    targetY = Math.max(64, Math.min(ch - bannerH - 24, targetY));
-
-    messageBanner.style.left = `${Math.round(targetX)}px`;
-    messageBanner.style.top = `${Math.round(targetY)}px`;
+    messageBanner.style.left = `${Math.round(cw / 2)}px`;
+    messageBanner.style.top = '64px';
   }
 
   function updateHelpSignPosition() {
@@ -154,12 +121,13 @@ window.addEventListener('DOMContentLoaded', async () => {
           break;
         case 'milestone_reached':
           sound.playQuotaReached();
-          // Milestone notification sign shown directly below Rockford
-          showMessage(
-            `<div class="milestone-title">★ MILESTONE: ${data.count} DIAMONDS! ★</div>` +
-            `<div class="milestone-sub">${data.title} (+${data.bonus.toLocaleString()} PTS)</div>`,
-            3500
-          );
+          // Milestone notification: floating arcade text in the cave at the diamond's cell
+          if (renderer) {
+            renderer.addFloatingText(data.x, data.y, [
+              { text: `★ ${data.count} DIAMONDS! ★`, color: '#FFFF00', size: 13 },
+              { text: `${data.title} (+${data.bonus.toLocaleString()} PTS)`, color: '#FFFFFF', size: 9 }
+            ], 2.8);
+          }
           break;
         case 'rockford_died':
           handleDeath(data);
@@ -229,6 +197,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     engine.reset();
     if (renderer) {
       renderer.hasInitCamera = false;
+      renderer.floatingTexts = [];
       renderer.recolorWithPalette(engine.seed);
     }
   }
