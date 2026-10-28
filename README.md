@@ -9,7 +9,7 @@ https://ernestoborio.github.io/infinite-boulder-dash
 
 ## Credits & Acknowledgments
 
-- **Peter Liepa and Chris Gray** — The creators of the original **Boulder Dash** (1984, First Star Software) on the Commodore 64.
+- **Peter Liepa and Chris Gray** — The creators of the original **Boulder Dash** (1984, First Star Software)
 - **Jake Gordon** — Creator of the open-source HTML5 Boulder Dash port. [https://github.com/jakesgordon/javascript-boulderdash]
 
 
@@ -85,10 +85,12 @@ BoulderDash/
 │   ├── test-infinite.js  # Infinite chunk generation, persistence, and palette tests
 │   └── test-roguelike.js # Permadeath, milestones, and seed generation tests
 ├── package.json          # Test runner scripts
+├── LICENSE.md            # GNU General Public License v3.0
 └── README.md             # Project documentation
 ```
 ## Source
 https://github.com/ErnestoBorio/infinite-boulder-dash
 
 ## License
-This project is free for you to do whatever you want, just give due credit to Peter Liepa, Chris Gray and Jake Gordon.
+
+This project is licensed under the [GNU General Public License v3.0](LICENSE.md).

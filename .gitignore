@@ -1,4 +1,7 @@
 .DS_Store
 node_modules/
+dist/
+.bin/
+*.zip
 PROMPT.md
 ROMPT.md

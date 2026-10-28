@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "test": "node test/test-caves.js && node test/test-engine.js && node test/test-infinite.js && node test/test-roguelike.js",
-    "serve": "npx serve ."
+    "serve": "npx -y serve .",
+    "package": "bash scripts/package.sh",
+    "deploy:itch": "bash scripts/deploy-itch.sh"
   },
   "keywords": ["boulderdash", "c64", "retro", "game"],
   "author": "",
-  "license": "MIT"
+  "license": "GPL-3.0-or-later"
 }

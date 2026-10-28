@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "serve",
+      "problemMatcher": [],
+      "label": "npm: serve",
+      "detail": "npx -y serve .",
+      "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "package",
+      "problemMatcher": [],
+      "label": "npm: package",
+      "detail": "Create clean itch.io zip archive in dist/",
+      "group": "build"
+    },
+    {
+      "type": "npm",
+      "script": "deploy:itch",
+      "problemMatcher": [],
+      "label": "npm: deploy:itch",
+      "detail": "Deploy build archive to itch.io using butler"
+    }
+  ]
+}
